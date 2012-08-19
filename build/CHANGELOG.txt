@@ -3,7 +3,7 @@ Sat Aug 18 5:43pm
 
 Summary of Changes:
 
-	GUI is now super sexy! And hopefully things are more agnostic to the user's OS...
+  GUI is now super sexy! And hopefully things are more agnostic to the user's OS...
 
 Version 1.0
 Sat Aug 18 8:40am
