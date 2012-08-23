@@ -4,9 +4,9 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.Display;
 
-public class Main {
+public class OrbitGame {
 	public static void main(String[] args) {
-		Main displayExample = new Main();
+		OrbitGame displayExample = new OrbitGame();
 		displayExample.start();
 	}
 	
