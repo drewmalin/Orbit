@@ -1,15 +1,22 @@
 package com.orbit.core;
 
+import java.util.ArrayList;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 public class InputManager {
 	private InputListener mouseListener;
 	private InputListener keyboardListener;
+	private ArrayList<KeyTrigger> keyTriggers;
 	
-	public InputManager() {
+	private Game gameHandle;
+	
+	public InputManager(Game g) {
 		mouseListener 		= new InputListener();
 		keyboardListener 	= new InputListener();
+		gameHandle 			= g;
+		keyTriggers			= new ArrayList<KeyTrigger>();
 	}
 	
 	public void setMouseListener(InputListener il) {
@@ -21,11 +28,19 @@ public class InputManager {
 	}
 	
 	public void pollKeyboard() {
-		while (Keyboard.next()) {
-			if (Keyboard.getEventKeyState()) {
-				keyboardListener.onEvent(Keyboard.getEventKey());
+
+		for (KeyTrigger kt : keyTriggers) {
+			if (Keyboard.isKeyDown(kt.key)) {
+				kt.onEvent();
 			}
 		}
+		
+		while (Keyboard.next()) {
+			if (!Keyboard.getEventKeyState()) continue;
+			
+			keyboardListener.onEvent(Keyboard.getEventKey());
+		}
+		
 	}
 	
 	public void pollMouse() {
@@ -34,5 +49,10 @@ public class InputManager {
 				mouseListener.onEvent(Mouse.getEventButton(), Mouse.getX(), Mouse.getY());
 			}
 		}
+	}
+
+	public void addKeyTrigger(int key, KeyTrigger keyTrigger) {
+		keyTrigger.key = key;
+		keyTriggers.add(keyTrigger);
 	}
 }

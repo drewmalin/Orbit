@@ -1,19 +1,32 @@
 package com.orbit.core;
+import java.util.ArrayList;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.util.vector.Vector3f;
 
 public class Game {
 	
+	//------  Component Managers  -------//
 	public InputManager inputManager;
 	public GraphicsManager graphicsManager;
 	public ResourceManager resourceManager;
 	public NetworkManager networkManager;
+	//-----------------------------------//
+	
+	public Camera camera;
+	public ArrayList<GameEntity> gameEntities;
+	public GameEntity playerFocusEntity;
+	public GameMap currentLevel;
 	
 	public Game() {
-		inputManager 	= new InputManager();
-		graphicsManager = new GraphicsManager();
-		resourceManager = new ResourceManager();
-		networkManager 	= new NetworkManager();
+		
+		inputManager 	= new InputManager(this);
+		graphicsManager = new GraphicsManager(this);
+		resourceManager = new ResourceManager(this);
+		networkManager 	= new NetworkManager(this);
+		camera			= new Camera(this);
+		gameEntities 	= new ArrayList<GameEntity>();
 	}
 	
 	public void initGame() {
@@ -25,10 +38,11 @@ public class Game {
 		graphicsManager.setFrust(60f);
 		graphicsManager.setZNear(0.1f);
 		graphicsManager.setZFar(100f);
-		graphicsManager.create("2D");
+		graphicsManager.create("3D");
 		
-		networkManager.setServerURL("http://lezendstudios.net/OrbitServer");
-		networkManager.connect();
+		camera.setLocation(new Vector3f(0f, 0f, 0f));
+		camera.setTarget(new Vector3f(0f, 0f, 0f));
+		
 	}
 
 	
@@ -63,6 +77,14 @@ public class Game {
 		}
 	};
 	
+	public void setFocusEntity(GameEntity ge) {
+		playerFocusEntity = ge;
+	}
+	
+	public void setLevel(GameMap map) {
+		currentLevel = map;
+	}
+	
 	public void start() {
 		
 		initGame();
@@ -71,7 +93,11 @@ public class Game {
 			
 			inputManager.pollKeyboard();
 			inputManager.pollMouse();
+			
+			graphicsManager.drawGame();
+			
 			Display.update();
+			Display.sync(60);
 		}
 		
 		Display.destroy();

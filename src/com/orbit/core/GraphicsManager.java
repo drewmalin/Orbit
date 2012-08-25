@@ -20,6 +20,12 @@ public class GraphicsManager {
 	private int MSAA				= 0;
 	private String title			= "Lezend";
 	
+	private Game gameHandle;
+	
+	public GraphicsManager(Game g) {
+		gameHandle = g;
+	}
+	
 	private void setGraphicsMode(String string) {
 		if (string.equals("2D")) {
 			GL11.glDepthMask(false);
@@ -37,7 +43,13 @@ public class GraphicsManager {
 			GL11.glLoadIdentity();
 			
 			GLU.gluPerspective(frust, (float)windowWidth/(float)windowHeight, zNear, zFar);
-			GLU.gluLookAt(0, 0, 0, 0, 0, 0, 0, 1, 0);
+			GLU.gluLookAt(gameHandle.camera.location.x, 
+						  gameHandle.camera.location.y, 
+						  gameHandle.camera.location.z, 
+						  gameHandle.camera.target.x, 
+						  gameHandle.camera.target.y, 
+						  gameHandle.camera.target.z,
+						  0, 1, 0);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
@@ -119,4 +131,42 @@ public class GraphicsManager {
 		}		
 	}
 
+	public void drawGame() {
+
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+
+		GL11.glPushMatrix();
+		GL11.glLoadIdentity();
+		GL11.glTranslatef(gameHandle.camera.location.x, 
+						  gameHandle.camera.location.y, 
+						  gameHandle.camera.location.z);
+		drawMap();
+		drawEntities();
+		GL11.glPopMatrix();
+	}
+	
+	public void drawEntities() {
+	
+	}
+	
+	public void drawMap() {
+		GL11.glBegin(GL11.GL_LINES);
+		GL11.glColor3d(1.0, 0.0, 0.0);
+		
+		int spacing = gameHandle.currentLevel.spacing;
+		
+		for (int x = 0; x < gameHandle.currentLevel.width*spacing; x+=spacing) {
+
+			GL11.glVertex2f(x, 0);
+			GL11.glVertex2f(x, (gameHandle.currentLevel.height * spacing) - spacing);
+		}
+		
+		for (int y = 0; y < gameHandle.currentLevel.height*spacing; y+=spacing) {
+			
+			GL11.glVertex2f(0, y);
+			GL11.glVertex2f((gameHandle.currentLevel.width * spacing) - spacing, y);
+		}
+		
+		GL11.glEnd();
+	}
 }
