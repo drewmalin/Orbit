@@ -146,7 +146,9 @@ public class GraphicsManager {
 	}
 	
 	public void drawEntities() {
-	
+		for (int id : gameHandle.gameEntities.keySet()) {
+			gameHandle.gameEntities.get(id).draw();
+		}
 	}
 	
 	public void drawMap() {
