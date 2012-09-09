@@ -29,4 +29,40 @@ public class Camera {
 	public void translateX(int i) {
 		location.x += i;
 	}
+
+	public int getPosition(int i) {
+		switch (i) {
+			case 0:
+				return (int) location.x;
+			case 1:
+				return (int) location.y;
+			case 2:
+				return (int) location.z;
+		}
+		return 0;
+	}
+
+	public boolean hitBorder(String op) {
+		//temp to support grid map (spacing shouldn't exist with textured levels)
+		int width = gameHandle.currentLevel.width * gameHandle.currentLevel.spacing;
+		int height = gameHandle.currentLevel.height * gameHandle.currentLevel.spacing;
+		
+		if (op.equals("N")) {
+			if (location.y < (gameHandle.graphicsManager.getHeight()/2) - 30)
+				return true;
+		}
+		else if (op.equals("W")) {
+			if (location.x < (gameHandle.graphicsManager.getWidth()/2) - 30)
+				return true;
+		}
+		else if (op.equals("E")) {
+			if (location.x > (width - gameHandle.graphicsManager.getWidth()/2) + 30)
+				return true;
+		}
+		else if (op.equals("S")) {
+			if (location.y > (height - gameHandle.graphicsManager.getHeight()/2) + 30)
+				return true;
+		}
+		return false;
+	}
 }

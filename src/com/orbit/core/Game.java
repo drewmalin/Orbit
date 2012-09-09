@@ -1,4 +1,5 @@
 package com.orbit.core;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.lwjgl.input.Keyboard;
@@ -12,13 +13,17 @@ public class Game {
 	public GraphicsManager graphicsManager;
 	public ResourceManager resourceManager;
 	public NetworkManager networkManager;
+	public TextureManager textureManager;
 	//-----------------------------------//
 	
 	public Camera camera;
-	public HashMap<Integer, GameEntity> gameEntities;
+	public ArrayList<GameEntity> gameEntities;
 	public GameEntity playerFocusEntity;
 	public GameMap currentLevel;
 	
+	public boolean multiplayer;
+	public final float diagonal = .70710678f;
+
 	public Game() {
 		
 		inputManager 	= new InputManager(this);
@@ -26,7 +31,8 @@ public class Game {
 		resourceManager = new ResourceManager(this);
 		networkManager 	= new NetworkManager(this);
 		camera			= new Camera(this);
-		gameEntities 	= new HashMap<Integer, GameEntity>();
+		textureManager 	= new TextureManager(this);
+		gameEntities 	= new ArrayList<GameEntity>();
 	}
 	
 	public void initGame() {
@@ -86,10 +92,8 @@ public class Game {
 	}
 	
 	public void addEntity(GameEntity ge) {
-		int id = resourceManager.generateID();
-		
-		ge.id = id;
-		gameEntities.put(id, ge);
+		ge.id = -1;
+		gameEntities.add(ge);
 	}
 	
 	public void start() {
@@ -103,7 +107,7 @@ public class Game {
 			
 			graphicsManager.drawGame();
 			
-			networkManager.put.work();
+			if (multiplayer) networkManager.put.work();
 			
 			Display.update();
 			Display.sync(60);

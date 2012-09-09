@@ -77,12 +77,4 @@ public class ResourceManager {
 		p.id = ge.id;
 		return p;		
 	}
-	
-	public int generateID() {
-		Random s = new Random();
-		int id = s.nextInt();
-		while (gameHandle.gameEntities.keySet().contains(id))
-			id = s.nextInt();
-		return id;
-	}
 }

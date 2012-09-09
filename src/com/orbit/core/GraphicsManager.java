@@ -32,6 +32,10 @@ public class GraphicsManager {
 			GL11.glDisable(GL11.GL_DEPTH_TEST);								
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			
+			GL11.glEnable(GL11.GL_BLEND);
+			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			GL11.glEnable(GL11.GL_TEXTURE_2D);	
+			
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, windowWidth, windowHeight, 0, -1, 1);
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
@@ -97,6 +101,14 @@ public class GraphicsManager {
 		frust = f;
 	}
 	
+	public int getWidth() {
+		return windowWidth;
+	}
+	
+	public int getHeight() {
+		return windowHeight;
+	}
+	
 	public void create(String gmode) {		
 		try {
 			Display.setDisplayMode(new DisplayMode( windowWidth, windowHeight ));
@@ -137,21 +149,24 @@ public class GraphicsManager {
 
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
-		GL11.glTranslatef(gameHandle.camera.location.x, 
-						  gameHandle.camera.location.y, 
-						  gameHandle.camera.location.z);
+		GL11.glTranslatef(windowWidth/2, windowHeight/2, 0);
+		GL11.glTranslatef(-gameHandle.camera.location.x, 
+						  -gameHandle.camera.location.y, 
+						  -gameHandle.camera.location.z);
 		drawMap();
 		drawEntities();
 		GL11.glPopMatrix();
 	}
 	
 	public void drawEntities() {
-		for (int id : gameHandle.gameEntities.keySet()) {
-			gameHandle.gameEntities.get(id).draw();
+		for (GameEntity ge : gameHandle.gameEntities) {
+			ge.draw();
 		}
 	}
 	
 	public void drawMap() {
+		GL11.glDisable(GL11.GL_TEXTURE_2D);	
+
 		GL11.glBegin(GL11.GL_LINES);
 		GL11.glColor3d(1.0, 0.0, 0.0);
 		
@@ -170,5 +185,7 @@ public class GraphicsManager {
 		}
 		
 		GL11.glEnd();
+		GL11.glEnable(GL11.GL_TEXTURE_2D);	
+
 	}
 }
