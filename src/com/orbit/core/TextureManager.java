@@ -16,9 +16,9 @@ public class TextureManager {
 		textureStore = new HashMap<Integer, TextureCycle>();
 	}
 
-	public void loadCycle(GameEntity ge, String file) throws Exception {
+	public void loadCycle(GameEntity ge, String filename) throws Exception {
 
-		XMLParser textureFile = new XMLParser(file);
+		XMLParser textureFile = new XMLParser(filename);
 		TextureCycle t = new TextureCycle();
 
 		for (Node animation : textureFile.root.children) {
@@ -30,7 +30,9 @@ public class TextureManager {
 					t.speedNano = text.readInt();
 				}
 				else if (text.name.equals("frame")) {
-					Texture texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream(text.readString()));
+					String file = text.readString();
+					String type = file.substring(file.indexOf(".") + 1).toUpperCase();
+					Texture texture = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(file));
 					textureList.add(texture);
 				}
 			}
