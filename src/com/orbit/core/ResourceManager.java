@@ -26,9 +26,11 @@ public class ResourceManager {
 					entity.setWidth(el.readInt());
 				else if (el.name.equals("height"))
 					entity.setHeight(el.readInt());
+				else if (el.name.equals("animationFile"))
+					entity.setAnimationFile(el.readString());
 			}
 		}
-		
+
 		return entity;
 	}
 

@@ -29,12 +29,12 @@ public class OrbitGame extends Game {
 		graphicsManager.setResolution(800, 600);
 		graphicsManager.create("2D");
 				
-		GameEntity player = new GameEntity(resourceManager.loadEntity("res/Player.xml"));
+		GameEntity player = resourceManager.loadEntity("res/Player.xml");
 		addEntity(player);
 		setFocusEntity(player);
 		
 		try {
-			textureManager.loadCycle(player, "res/PlayerAnimations.xml");
+			textureManager.loadCycle(playerFocusEntity, playerFocusEntity.getAnimationFile());
 			player.setTexture(textureManager.setFrame(playerFocusEntity.id, "idle_south"));
 		} catch (Exception e) {
 			e.printStackTrace();

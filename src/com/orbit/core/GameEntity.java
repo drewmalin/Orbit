@@ -15,11 +15,13 @@ public class GameEntity {
 	
 	public int id;
 	private Texture texture;
+	public String animationFile;
 	
 	public GameEntity() {
 		position = new Vector3f(0, 0, 0);
 		rotation = new Vector3f(0, 0, 0);
 		width = height = 0;
+		animationFile = "";
 	}
 	
 	public GameEntity(GameEntity ge) {
@@ -52,10 +54,6 @@ public class GameEntity {
 
 	public void setTexture(Texture tex) {
 		texture = tex;
-	}
-	
-	public void loadTextures(String filename) {
-		
 	}
 	
 	public void draw() {
@@ -104,6 +102,10 @@ public class GameEntity {
 		return file;
 	}
 
+	public String getAnimationFile() {
+		return animationFile;
+	}
+	
 	public void moveY(float i, GameMap currentLevel) {
 		if (position.y + i > 0 &&
 				position.y + i < (currentLevel.height * currentLevel.spacing))
@@ -146,5 +148,9 @@ public class GameEntity {
 		}
 		
 		return lock;
+	}
+
+	public void setAnimationFile(String str) {
+		animationFile = str;
 	}
 }
