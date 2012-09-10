@@ -81,13 +81,18 @@ public class XMLParser {
 	 */
 	private void persistElement(Node n, String contextLine) throws Exception {
 		n.name = readElementName(contextLine);
-				
-		if (contextLine.contains("</" + n.name + ">")) {
+		n.data = "";
+		
+		if (contextLine.contains("</" + n.name + ">")) {					//Data is on one line (<a>data</a>)
 			n.data = readElementValue(contextLine);
 		}
 		else {
 			String strLine = readLine(br);
-			while (strLine != null && !strLine.equals("</" + n.name + ">")) {
+			while (!strLine.contains("<") || !strLine.contains(">")) {		  //Data uses multiple lines (<a>data\ndata\ndata</a>)
+				n.data += strLine + "\n";
+				strLine = readLine(br);
+			}
+			while (strLine != null && !strLine.equals("</" + n.name + ">")) { //Data is nested (<a><b>data</b></a>)
 				Node child = new Node();
 				n.children.add(child);
 				persistElement(child, strLine);

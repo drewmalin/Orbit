@@ -22,12 +22,12 @@ public class Camera {
 		target.set(vector3f);
 	}
 
-	public void translateY(int i) {
-		location.y += i;
+	public void translateY(float f) {
+		location.y += f;
 	}
 	
-	public void translateX(int i) {
-		location.x += i;
+	public void translateX(float f) {
+		location.x += f;
 	}
 
 	public int getPosition(int i) {
@@ -40,29 +40,5 @@ public class Camera {
 				return (int) location.z;
 		}
 		return 0;
-	}
-
-	public boolean hitBorder(String op) {
-		//temp to support grid map (spacing shouldn't exist with textured levels)
-		int width = gameHandle.currentLevel.width * gameHandle.currentLevel.spacing;
-		int height = gameHandle.currentLevel.height * gameHandle.currentLevel.spacing;
-		
-		if (op.equals("N")) {
-			if (location.y < (gameHandle.graphicsManager.getHeight()/2) - 30)
-				return true;
-		}
-		else if (op.equals("W")) {
-			if (location.x < (gameHandle.graphicsManager.getWidth()/2) - 30)
-				return true;
-		}
-		else if (op.equals("E")) {
-			if (location.x > (width - gameHandle.graphicsManager.getWidth()/2) + 30)
-				return true;
-		}
-		else if (op.equals("S")) {
-			if (location.y > (height - gameHandle.graphicsManager.getHeight()/2) + 30)
-				return true;
-		}
-		return false;
 	}
 }

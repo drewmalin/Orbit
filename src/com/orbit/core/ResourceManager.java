@@ -42,12 +42,23 @@ public class ResourceManager {
 		
 		for (Node mapEl : mapFile.root.children) {
 			for (Node el : mapEl.children) {
-				if (el.name.equals("width"))
-					map.setWidth(el.readInt());
-				else if (el.name.equals("height"))
-					map.setHeight(el.readInt());
-				else if (el.name.equals("spacing"))
-					map.setSpacing(el.readInt());
+				if (el.name.equals("tileDimensions"))
+					map.setTileDimension(el.readInt());
+				else if (el.name.equals("tile")) {
+					MapTile mt = new MapTile();
+					for (Node tileChild : el.children) {
+						if (tileChild.name.equals("id"))
+							mt.id = tileChild.readInt();
+						else if (tileChild.name.equals("file"))
+							mt.loadTexture(tileChild.readString());
+						else if (tileChild.name.equals("collidable"))
+							mt.collidable = tileChild.readBoolean();
+					}
+					mt.width = mt.height = map.tileDimensions;
+					map.tiles.put(mt.id, mt);
+				}
+				else if (el.name.equals("canvas"))
+					map.parseCanvas(el.data);
 			}
 		}
 		return map;

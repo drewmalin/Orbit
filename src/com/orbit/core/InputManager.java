@@ -28,21 +28,7 @@ public class InputManager {
 	}
 	
 	public void pollKeyboard() {
-/*
-		for (KeyTrigger kt : keyTriggers) {
-			if (Keyboard.isKeyDown(kt.key)) {
-				kt.onEvent();
-			}
-		}
-*/	
 		keyboardListener.onEvent();
-	/*
-		while (Keyboard.next()) {
-			if (!Keyboard.getEventKeyState()) continue;
-			
-			
-		}
-		*/
 	}
 	
 	public void pollMouse() {

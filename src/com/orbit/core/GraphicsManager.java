@@ -4,6 +4,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.Pbuffer;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
@@ -21,7 +22,8 @@ public class GraphicsManager {
 	private String title			= "Lezend";
 	
 	private Game gameHandle;
-	
+	public final int border = 30;
+
 	public GraphicsManager(Game g) {
 		gameHandle = g;
 	}
@@ -144,48 +146,50 @@ public class GraphicsManager {
 	}
 
 	public void drawGame() {
-
+		
+		int dim = gameHandle.currentLevel.tileDimensions;
+		cleanEntities();
+		
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-
+		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+		
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
 		GL11.glTranslatef(windowWidth/2, windowHeight/2, 0);
 		GL11.glTranslatef(-gameHandle.camera.location.x, 
 						  -gameHandle.camera.location.y, 
 						  -gameHandle.camera.location.z);
-		drawMap();
-		drawEntities();
+		
+		for (int row = 0; row < gameHandle.currentLevel.mapData.length; row++) {
+			for (int col = 0; col < gameHandle.currentLevel.mapData[row].length; col++) {
+				for (int tile = 0; tile < gameHandle.currentLevel.mapData[row][col].length; tile++) {
+					gameHandle.currentLevel.tiles.get(gameHandle.currentLevel.mapData[row][col][tile]).draw(col*dim, row*dim);
+				}
+			}
+			for (GameEntity ge : gameHandle.gameEntities) {
+
+				if (ge.clean)
+					if (ge.getPosition().y < dim*row) {
+						ge.draw();
+					}
+			}
+		}
+	
 		GL11.glPopMatrix();
+	}
+	
+	public void cleanEntities() {
+		for (GameEntity ge : gameHandle.gameEntities) {
+			ge.clean = true;
+		}
 	}
 	
 	public void drawEntities() {
 		for (GameEntity ge : gameHandle.gameEntities) {
 			ge.draw();
 		}
-	}
-	
-	public void drawMap() {
-		GL11.glDisable(GL11.GL_TEXTURE_2D);	
-
-		GL11.glBegin(GL11.GL_LINES);
-		GL11.glColor3d(1.0, 0.0, 0.0);
-		
-		int spacing = gameHandle.currentLevel.spacing;
-		
-		for (int x = 0; x < gameHandle.currentLevel.width*spacing; x+=spacing) {
-
-			GL11.glVertex2f(x, 0);
-			GL11.glVertex2f(x, (gameHandle.currentLevel.height * spacing) - spacing);
-		}
-		
-		for (int y = 0; y < gameHandle.currentLevel.height*spacing; y+=spacing) {
-			
-			GL11.glVertex2f(0, y);
-			GL11.glVertex2f((gameHandle.currentLevel.width * spacing) - spacing, y);
-		}
-		
-		GL11.glEnd();
-		GL11.glEnable(GL11.GL_TEXTURE_2D);	
-
 	}
 }

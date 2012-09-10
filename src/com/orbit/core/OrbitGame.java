@@ -24,8 +24,6 @@ public class OrbitGame extends Game {
 		inputManager.setKeyboardListener(keyboardListener);
 		inputManager.setMouseListener(mouseListener);
 		
-		addTriggers();
-		
 		graphicsManager.setResolution(800, 600);
 		graphicsManager.create("2D");
 				
@@ -47,12 +45,12 @@ public class OrbitGame extends Game {
 			networkManager.connect();
 		}
 		else {
-			GameMap map = new GameMap(resourceManager.loadMap("res/Level1.xml"));
+			GameMap map = resourceManager.loadMap("res/Level1.xml");
 			setLevel(map);
 		}
 		
-		int startX = (currentLevel.width * currentLevel.spacing)/2;
-		int startY = (currentLevel.height * currentLevel.spacing)/2;
+		int startX = (currentLevel.mapWidth * currentLevel.tileDimensions)/2;
+		int startY = (currentLevel.mapHeight * currentLevel.tileDimensions)/2;
 
 		playerFocusEntity.setPosition(new float[]{startX, startY, 0});
 		camera.setLocation(new Vector3f(startX, startY, 0));
@@ -69,7 +67,7 @@ public class OrbitGame extends Game {
 		public void work(Packet p) {
 			if (p.code == networkManager.ADD_ENTITY) {
 				if (p.type.equals("MAP")) {
-					GameMap map = new GameMap(resourceManager.loadMap(p.file));
+					GameMap map = resourceManager.loadMap(p.file);
 					setLevel(map);
 				}
 				else {
@@ -90,51 +88,68 @@ public class OrbitGame extends Game {
 	private InputListener keyboardListener = new InputListener() {
 		public void onEvent() {
 			
-			int camBox = playerFocusEntity.cameraLockBox(currentLevel, graphicsManager);
+			boolean lockNS = playerFocusEntity.cameraLockNS(currentLevel, graphicsManager);
+			boolean lockEW = playerFocusEntity.cameraLockEW(currentLevel, graphicsManager);
 			
 			while (Keyboard.next()) {
-				if (Keyboard.getEventKeyState()) 
-					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE)
+				if (Keyboard.getEventKeyState()) {
+					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) 
 						System.exit(0);
+					else if (Keyboard.getEventKey() == Keyboard.KEY_0) { 
+						//**Temporary: testing swapping game levels **//
+						GameMap map = resourceManager.loadMap("res/Level2.xml");
+						setLevel(map);
+						int startX = (currentLevel.mapWidth * currentLevel.tileDimensions)/2;
+						int startY = (currentLevel.mapHeight * currentLevel.tileDimensions)/2;
+
+						playerFocusEntity.setPosition(new float[]{startX, startY, 0});
+						camera.setLocation(new Vector3f(startX, startY, 0));
+					}
+				}
+				
 			}
 			
 			if (Keyboard.isKeyDown(Keyboard.KEY_W) && Keyboard.isKeyDown(Keyboard.KEY_A)) {
+				if (lockNS) camera.translateY(-1 * diagonal);
+				if (lockEW) camera.translateX(-1 * diagonal);
 				playerFocusEntity.moveY(-1 * diagonal, currentLevel);
 				playerFocusEntity.moveX(-1 * diagonal, currentLevel);
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_W) && Keyboard.isKeyDown(Keyboard.KEY_D)) {
+				if (lockNS) camera.translateY(-1 * diagonal);
+				if (lockEW) camera.translateX(1 * diagonal);
 				playerFocusEntity.moveY(-1 * diagonal, currentLevel);
 				playerFocusEntity.moveX(1 * diagonal, currentLevel);
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S) && Keyboard.isKeyDown(Keyboard.KEY_A)) {
+				if (lockNS) camera.translateY(1 * diagonal);
+				if (lockEW) camera.translateX(-1 * diagonal);
 				playerFocusEntity.moveY(1 * diagonal, currentLevel);
 				playerFocusEntity.moveX(-1 * diagonal, currentLevel);
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S) && Keyboard.isKeyDown(Keyboard.KEY_D)) {
+				if (lockNS) camera.translateY(1 * diagonal);
+				if (lockEW) camera.translateX(1 * diagonal);
 				playerFocusEntity.moveY(1 * diagonal, currentLevel);
 				playerFocusEntity.moveX(1 * diagonal, currentLevel);
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-				if (camBox >= 2)
-					camera.translateY(-1);
+				if (lockNS) camera.translateY(-1);
 				playerFocusEntity.moveY(-1, currentLevel);
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_north"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-				if (camBox == 1 || camBox ==3)
-					camera.translateX(-1);
+				if (lockEW) camera.translateX(-1);
 				playerFocusEntity.moveX(-1, currentLevel);
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_west"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-				if (camBox >= 2)
-					camera.translateY(1);
+				if (lockNS) camera.translateY(1);
 				playerFocusEntity.moveY(1, currentLevel);
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_south"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-				if (camBox == 1 || camBox == 3)
-					camera.translateX(1);
+				if (lockEW) camera.translateX(1);
 				playerFocusEntity.moveX(1, currentLevel);
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_east"));
 			}
@@ -166,41 +181,4 @@ public class OrbitGame extends Game {
 			}
 		}
 	};
-	
-	private void addTriggers() {
-		inputManager.addKeyTrigger(Keyboard.KEY_W, new KeyTrigger() {
-			public void onEvent() {
-				if (playerFocusEntity.cameraLockBox(currentLevel, graphicsManager) >= 2)
-					camera.translateY(-1);
-				playerFocusEntity.moveY(-1, currentLevel);
-				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_north"));
-			}
-		});
-		inputManager.addKeyTrigger(Keyboard.KEY_A, new KeyTrigger() {
-			public void onEvent() {
-				if (playerFocusEntity.cameraLockBox(currentLevel, graphicsManager) == 1 || 
-						playerFocusEntity.cameraLockBox(currentLevel, graphicsManager) ==3)
-					camera.translateX(-1);
-				playerFocusEntity.moveX(-1, currentLevel);
-				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_west"));
-			}
-		});
-		inputManager.addKeyTrigger(Keyboard.KEY_S, new KeyTrigger() {
-			public void onEvent() {
-				if (playerFocusEntity.cameraLockBox(currentLevel, graphicsManager) >= 2)
-					camera.translateY(1);
-				playerFocusEntity.moveY(1, currentLevel);
-				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_south"));
-			}
-		});
-		inputManager.addKeyTrigger(Keyboard.KEY_D, new KeyTrigger() {
-			public void onEvent() {
-				if (playerFocusEntity.cameraLockBox(currentLevel, graphicsManager) == 1 ||
-						playerFocusEntity.cameraLockBox(currentLevel, graphicsManager) == 3)
-					camera.translateX(1);
-				playerFocusEntity.moveX(1, currentLevel);
-				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_east"));
-			}
-		});
-	}
 }

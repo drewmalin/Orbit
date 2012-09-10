@@ -10,12 +10,23 @@ public class TextureManager {
 
 	private Game gameHandle;
 	private HashMap<Integer, TextureCycle> textureStore;
-	
+
+	/* Constructor:
+	 * Creates a 'texture store' to persist each unique texture in an animation.
+	 * Establishes a handle back to the main game object.
+	 */
 	public TextureManager(Game game) {
 		gameHandle = game;
 		textureStore = new HashMap<Integer, TextureCycle>();
 	}
 
+	/* loadCycle:
+	 * Parses an animation file. Animation files consist of a series of frames in an
+	 * animation, and an animation speed (in nanoseconds). The following function persists
+	 * that speed, and loads a texture for each unique frame in the cylce. To access animations,
+	 * provide an id (unique to each entity) and the name of the animation in question (the 
+	 * element name used in the animation xml file).
+	 */
 	public void loadCycle(GameEntity ge, String filename) throws Exception {
 
 		XMLParser textureFile = new XMLParser(filename);
@@ -40,10 +51,19 @@ public class TextureManager {
 			t.cycle.put(animation.name, textureList);
 		}
 		
+		/* Generate an id for each entity. By default, each entity is given a -1 id.
+		 * When an entity is loaded with animations, an id value is generated for it.
+		 */
 		if (ge.id == -1) ge.id = textureStore.size();
 		textureStore.put(ge.id, t);
 	}
 
+	/* nextFrame:
+	 * Get the next frame in the requested animation for a given entity. Based on the
+	 * animation speed provided in the animation xml file, the function determines if
+	 * a new frame be drawn for the animation cycle, or if no new frame is needed at this
+	 * time.
+	 */
 	public Texture nextFrame(int id, String animation) {
 		TextureCycle tc = textureStore.get(id);
 		return tc.getNextFrame(animation);

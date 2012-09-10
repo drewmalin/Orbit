@@ -12,10 +12,11 @@ public class GameEntity {
 	private int width;
 	private int height;
 	private String file;
-	
+
 	public int id;
 	private Texture texture;
 	public String animationFile;
+	public boolean clean;
 	
 	public GameEntity() {
 		position = new Vector3f(0, 0, 0);
@@ -57,10 +58,9 @@ public class GameEntity {
 	}
 	
 	public void draw() {
-		texture.bind();	
-		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-		
+		clean = false;
+		texture.bind();
+		GL11.glPushMatrix();
 		GL11.glColor3d(1, 1, 1);
 		GL11.glTranslatef(position.x, position.y, position.z);
 		GL11.glBegin(GL11.GL_QUADS);
@@ -76,6 +76,7 @@ public class GameEntity {
 			GL11.glTexCoord2f(0, 1);
 			GL11.glVertex2f(0, height);
 		GL11.glEnd();
+		GL11.glPopMatrix();
 	}
 
 	public int getWidth() {
@@ -108,43 +109,49 @@ public class GameEntity {
 	
 	public void moveY(float i, GameMap currentLevel) {
 		if (position.y + i > 0 &&
-				position.y + i < (currentLevel.height * currentLevel.spacing))
+				position.y + i < ((currentLevel.mapHeight - 1)* currentLevel.tileDimensions))
 		position.y += i;
 	}
 	
 	public void moveX(float f, GameMap currentLevel) {
 		if (position.x + f > 0 &&
-				position.x + f < (currentLevel.width * currentLevel.spacing))
+				position.x + f < ((currentLevel.mapWidth - 1) * currentLevel.tileDimensions))
 		position.x += f;
 	}
 
-	/*
-	 * Locked N/S/E/W: return 3
-	 * Locked N/S: return 2
-	 * Locked E/W: return 1
-	 * Unlocked: return 0
+	/* cameraLockNS:
+	 * Determines if the camera should lock to the player in the N/S directions. Effectively,
+	 * determines if there is any excess height to the map beyond the confines of the window. 
+	 * If there is, then the camera should lock onto the player so that the player does not walk
+	 * out off of the screen.
 	 */
-	public int cameraLockBox(GameMap map, GraphicsManager graphicsManager) {
-		int border = 30;
-		int mapWidth = map.width * map.spacing;
-		int mapHeight = map.height * map.spacing;
-		int screenWidth = graphicsManager.getWidth();
+	public boolean cameraLockNS(GameMap map, GraphicsManager graphicsManager) {
+		boolean lock = false;
+		int mapHeight = map.mapHeight * map.tileDimensions;
 		int screenHeight = graphicsManager.getHeight();
-		
-		int right = mapWidth - screenWidth + (border*2); //excess width
-		int top = mapHeight - screenHeight + (border*2); //excess height
+		int top = mapHeight - screenHeight + (graphicsManager.border*2); //excess height
 
-		int lock = 0; // assume outside
-		
-		//check inside top/bot
 		if (position.y > ((mapHeight/2) - top/2) &&
 				position.y < ((mapHeight/2) + top/2)) {
-			lock += 2;
+			lock = true;
 		}
-		//check inside left/right
+		
+		return lock;
+	}
+	
+	/* cameraLockEW:
+	 * Determines if the camera should lock to the player in the E/W directions. See
+	 * cameraLockNS.
+	 */
+	public boolean cameraLockEW(GameMap map, GraphicsManager graphicsManager) {
+		boolean lock = false;
+		int mapWidth = map.mapWidth * map.tileDimensions;
+		int screenWidth = graphicsManager.getWidth();
+		int right = mapWidth - screenWidth + (graphicsManager.border*2); //excess width
+
 		if (position.x > ((mapWidth/2) - right/2) &&
 				position.x < ((mapWidth/2) + right/2)) {
-			lock += 1;
+			lock = true;
 		}
 		
 		return lock;
