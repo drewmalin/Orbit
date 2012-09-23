@@ -6,29 +6,29 @@ import org.newdawn.slick.opengl.Texture;
 
 public class GameEntity {
 
-	private Vector3f position;
+	public Vector3f position;
 	private Vector3f rotation;
 	
-	private int width;
-	private int height;
+	public int width;
+	public int height;
+	private float mass;
 	private String file;
-
+	String scriptFile;
+	private Game gameHandle;
+	
 	public int id;
 	private Texture texture;
 	public String animationFile;
 	public boolean clean;
 	
-	public GameEntity() {
+	public GameEntity(Game g) {
+		gameHandle = g;
 		position = new Vector3f(0, 0, 0);
 		rotation = new Vector3f(0, 0, 0);
 		width = height = 0;
-		animationFile = "";
-	}
-	
-	public GameEntity(GameEntity ge) {
-		position = new Vector3f(ge.position);
-		width    = ge.width;
-		height   = ge.height;
+		animationFile = null;
+		scriptFile = null;
+		mass = -1;
 	}
 
 	public void setPosition(float[] floatArr) {
@@ -56,6 +56,7 @@ public class GameEntity {
 	public void setTexture(Texture tex) {
 		texture = tex;
 	}
+	
 	
 	public void draw() {
 		clean = false;
@@ -107,16 +108,53 @@ public class GameEntity {
 		return animationFile;
 	}
 	
-	public void moveY(float i, GameMap currentLevel) {
-		if (position.y + i > 0 &&
-				position.y + i < ((currentLevel.mapHeight - 1)* currentLevel.tileDimensions))
-		position.y += i;
+	public float moveY(float i) {
+
+		float multiplier = 1;
+		
+		if (PhysicsUtilities.onMapY(this, i, gameHandle.currentLevel)) {
+			for (GameEntity e : gameHandle.gameEntities) {
+				if (PhysicsUtilities.collision(this, 0, i, e)) {
+					if (e.mass >= 0) {
+						multiplier -= e.mass;
+						multiplier *= e.moveY(i * multiplier);
+					}
+					if (e.scriptFile != null) {
+						gameHandle.onInteract(e);
+						break;
+					}
+				}
+			}
+			position.y += i * multiplier;
+			return multiplier;
+		}
+		
+		return 0;
 	}
 	
-	public void moveX(float f, GameMap currentLevel) {
-		if (position.x + f > 0 &&
-				position.x + f < ((currentLevel.mapWidth - 1) * currentLevel.tileDimensions))
-		position.x += f;
+	public float moveX(float f) {
+
+		float multiplier = 1;
+
+		if (PhysicsUtilities.onMapX(this, f, gameHandle.currentLevel)) {
+			for (GameEntity e : gameHandle.gameEntities){ 
+				if (PhysicsUtilities.collision(this, f, 0, e)) {
+					if (e.mass >= 0) { 
+						multiplier -= e.mass;
+						multiplier *= e.moveX(f * multiplier);
+					}
+					if (e.scriptFile != null) {
+						gameHandle.onInteract(e);
+						break;
+					}
+				}
+			}
+			position.x += f * multiplier;
+
+			return multiplier;
+		}
+		
+		return 0;
 	}
 
 	/* cameraLockNS:
@@ -159,5 +197,40 @@ public class GameEntity {
 
 	public void setAnimationFile(String str) {
 		animationFile = str;
+		loadFirstTimeAnimation();
+	}
+
+	public void loadFirstTimeAnimation() {
+		try {
+			gameHandle.textureManager.loadCycle(this, this.getAnimationFile());
+			setTexture(gameHandle.textureManager.setFrame(this.id, "idle_south"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void setScriptFile(String str) {
+		str = str.substring(str.lastIndexOf("/")+1, str.indexOf("."));
+		scriptFile = str;
+	}
+
+	public void idle() {
+		String last = gameHandle.textureManager.lastAnimation(this.id);
+		String idleAnim = "idle_south";
+		
+		if (last.contains("south"))
+			idleAnim = "idle_south";
+		else if (last.contains("north"))
+			idleAnim = "idle_north";
+		else if (last.contains("east"))
+			idleAnim = "idle_east";
+		else if (last.contains("west"))
+			idleAnim = "idle_west";
+		
+		this.setTexture(gameHandle.textureManager.setFrame(this.id, idleAnim));		
+	}
+
+	public void setMass(float m) {
+		mass = m;
 	}
 }

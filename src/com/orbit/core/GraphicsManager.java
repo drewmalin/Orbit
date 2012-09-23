@@ -169,6 +169,7 @@ public class GraphicsManager {
 					gameHandle.currentLevel.tiles.get(gameHandle.currentLevel.mapData[row][col][tile]).draw(col*dim, row*dim);
 				}
 			}
+			
 			for (GameEntity ge : gameHandle.gameEntities) {
 
 				if (ge.clean)

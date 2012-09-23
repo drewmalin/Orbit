@@ -5,6 +5,8 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class OrbitGame extends Game {
 		
+	boolean temp = false;
+	
 	public static void main(String[] args) {
 		OrbitGame game = new OrbitGame();
 		game.start();
@@ -27,7 +29,7 @@ public class OrbitGame extends Game {
 		graphicsManager.setResolution(800, 600);
 		graphicsManager.create("2D");
 				
-		GameEntity player = resourceManager.loadEntity("res/Player.xml");
+		GameEntity player = resourceManager.loadEntity("res/entities/Player.xml");
 		addEntity(player);
 		setFocusEntity(player);
 		
@@ -38,56 +40,22 @@ public class OrbitGame extends Game {
 			e.printStackTrace();
 		}
 
-		if (multiplayer) {
-			networkManager.setServerURL("http://lezendstudios.net/OrbitServer", 1337);
-			networkManager.setPutService(putWebService);
-			networkManager.setGetService(getWebService);
-			networkManager.connect();
-		}
-		else {
-			GameMap map = resourceManager.loadMap("res/Level1.xml");
-			setLevel(map);
-		}
+		GameMap map = resourceManager.loadMap("res/maps/Level1.xml");
+		setLevel(map);
 		
 		int startX = (currentLevel.mapWidth * currentLevel.tileDimensions)/2;
 		int startY = (currentLevel.mapHeight * currentLevel.tileDimensions)/2;
 
 		playerFocusEntity.setPosition(new float[]{startX, startY, 0});
 		camera.setLocation(new Vector3f(startX, startY, 0));
+		
 	}
-
-	private WebService putWebService = new WebService() {	
-		public void work(Packet p) {
-			Packet newPacket = resourceManager.packetify(playerFocusEntity);
-			networkManager.send(newPacket);
-		}
-	};
-	
-	private WebService getWebService = new WebService() {
-		public void work(Packet p) {
-			if (p.code == networkManager.ADD_ENTITY) {
-				if (p.type.equals("MAP")) {
-					GameMap map = resourceManager.loadMap(p.file);
-					setLevel(map);
-				}
-				else {
-					GameEntity ge = new GameEntity();
-					addEntity(ge);
-					resourceManager.updateFromPacket(ge, p);
-				}
-			}
-			else if (p.code == networkManager.UPDATE_ENTITY) {
-				resourceManager.updateFromPacket(gameEntities.get(p.id), p);
-			}
-			else if (p.code == networkManager.DROP_ENTITY) {
-				gameEntities.remove(p.id);
-			}
-		}
-	};
 	
 	private InputListener keyboardListener = new InputListener() {
 		public void onEvent() {
 			
+			float playerDeltaX = 0, camDeltaX = 0;
+			float playerDeltaY = 0, camDeltaY = 0;
 			boolean lockNS = playerFocusEntity.cameraLockNS(currentLevel, graphicsManager);
 			boolean lockEW = playerFocusEntity.cameraLockEW(currentLevel, graphicsManager);
 			
@@ -97,77 +65,106 @@ public class OrbitGame extends Game {
 						System.exit(0);
 					else if (Keyboard.getEventKey() == Keyboard.KEY_0) { 
 						//**Temporary: testing swapping game levels **//
-						GameMap map = resourceManager.loadMap("res/Level2.xml");
-						setLevel(map);
-						int startX = (currentLevel.mapWidth * currentLevel.tileDimensions)/2;
-						int startY = (currentLevel.mapHeight * currentLevel.tileDimensions)/2;
-
-						playerFocusEntity.setPosition(new float[]{startX, startY, 0});
-						camera.setLocation(new Vector3f(startX, startY, 0));
+						changeLevel("Level2.xml");
 					}
 				}
 				
 			}
 			
 			if (Keyboard.isKeyDown(Keyboard.KEY_W) && Keyboard.isKeyDown(Keyboard.KEY_A)) {
+				playerDeltaY = -1 * diagonal;
+				playerDeltaX = -1 * diagonal;
+				if (lockNS) camDeltaY = playerDeltaY;
+				if (lockEW) camDeltaX = playerDeltaX;
+				/*
 				if (lockNS) camera.translateY(-1 * diagonal);
 				if (lockEW) camera.translateX(-1 * diagonal);
 				playerFocusEntity.moveY(-1 * diagonal, currentLevel);
 				playerFocusEntity.moveX(-1 * diagonal, currentLevel);
+				*/
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_W) && Keyboard.isKeyDown(Keyboard.KEY_D)) {
+				playerDeltaY = -1 * diagonal;
+				playerDeltaX =  1 * diagonal;
+				if (lockNS) camDeltaY = playerDeltaY;
+				if (lockEW) camDeltaX = playerDeltaX;
+				/*
 				if (lockNS) camera.translateY(-1 * diagonal);
 				if (lockEW) camera.translateX(1 * diagonal);
 				playerFocusEntity.moveY(-1 * diagonal, currentLevel);
 				playerFocusEntity.moveX(1 * diagonal, currentLevel);
+				*/
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S) && Keyboard.isKeyDown(Keyboard.KEY_A)) {
+				playerDeltaY =  1 * diagonal;
+				playerDeltaX = -1 * diagonal;
+				if (lockNS) camDeltaY = playerDeltaY;
+				if (lockEW) camDeltaX = playerDeltaX;
+				/*
 				if (lockNS) camera.translateY(1 * diagonal);
 				if (lockEW) camera.translateX(-1 * diagonal);
 				playerFocusEntity.moveY(1 * diagonal, currentLevel);
 				playerFocusEntity.moveX(-1 * diagonal, currentLevel);
+				*/
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S) && Keyboard.isKeyDown(Keyboard.KEY_D)) {
+				playerDeltaY = 1 * diagonal;
+				playerDeltaX = 1 * diagonal;
+				if (lockNS) camDeltaY = playerDeltaY;
+				if (lockEW) camDeltaX = playerDeltaX;
+				/*
 				if (lockNS) camera.translateY(1 * diagonal);
 				if (lockEW) camera.translateX(1 * diagonal);
 				playerFocusEntity.moveY(1 * diagonal, currentLevel);
 				playerFocusEntity.moveX(1 * diagonal, currentLevel);
+				*/
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+				playerDeltaY = -1;
+				if (lockNS) camDeltaY = playerDeltaY;
+				/*
 				if (lockNS) camera.translateY(-1);
 				playerFocusEntity.moveY(-1, currentLevel);
+				*/
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_north"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+				playerDeltaX = -1;
+				if (lockEW) camDeltaX = playerDeltaX;
+				/*
 				if (lockEW) camera.translateX(-1);
 				playerFocusEntity.moveX(-1, currentLevel);
+				*/
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_west"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+				playerDeltaY = 1;
+				if (lockNS) camDeltaY = playerDeltaY;
+				/*
 				if (lockNS) camera.translateY(1);
 				playerFocusEntity.moveY(1, currentLevel);
+				*/
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_south"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+				playerDeltaX = 1;
+				if (lockEW) camDeltaX = playerDeltaX;
+				/*
 				if (lockEW) camera.translateX(1);
 				playerFocusEntity.moveX(1, currentLevel);
+				*/
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_east"));
 			}
 			else {
-				String last = textureManager.lastAnimation(playerFocusEntity.id);
-				String idleAnim = "idle_south";
-				
-				if (last.contains("south"))
-					idleAnim = "idle_south";
-				else if (last.contains("north"))
-					idleAnim = "idle_north";
-				else if (last.contains("east"))
-					idleAnim = "idle_east";
-				else if (last.contains("west"))
-					idleAnim = "idle_west";
-				
-				playerFocusEntity.setTexture(textureManager.setFrame(playerFocusEntity.id, idleAnim));
+				playerFocusEntity.idle();
 			}
+			
+			float mult = 1;
+			if (playerDeltaX != 0) mult = playerFocusEntity.moveX(playerDeltaX);
+			if (playerDeltaY != 0) mult = playerFocusEntity.moveY(playerDeltaY);
+			if (camDeltaX != 0) camera.translateX(camDeltaX * mult);
+			if (camDeltaY != 0) camera.translateY(camDeltaY * mult);
+
 		}
 	};
 	

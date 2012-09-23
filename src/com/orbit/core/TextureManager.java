@@ -54,7 +54,7 @@ public class TextureManager {
 		/* Generate an id for each entity. By default, each entity is given a -1 id.
 		 * When an entity is loaded with animations, an id value is generated for it.
 		 */
-		if (ge.id == -1) ge.id = textureStore.size();
+		//if (ge.id == -1) ge.id = textureStore.size();
 		textureStore.put(ge.id, t);
 	}
 

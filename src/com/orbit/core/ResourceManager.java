@@ -13,9 +13,10 @@ public class ResourceManager {
 	}
 
 	public GameEntity loadEntity(String file) {
+
 		XMLParser entityFile = new XMLParser(file);
 		
-		GameEntity entity = new GameEntity();
+		GameEntity entity = new GameEntity(gameHandle);
 		entity.setFile(file);
 		
 		for (Node entityEl : entityFile.root.children) {
@@ -26,8 +27,14 @@ public class ResourceManager {
 					entity.setWidth(el.readInt());
 				else if (el.name.equals("height"))
 					entity.setHeight(el.readInt());
-				else if (el.name.equals("animationFile"))
+				else if (el.name.equals("mass"))
+					entity.setMass(el.readFloat());
+				else if (el.name.equals("animationFile")) {
 					entity.setAnimationFile(el.readString());
+				}
+				else if (el.name.equals("scriptFile")) {
+					entity.setScriptFile(el.readString());
+				}
 			}
 		}
 
@@ -59,6 +66,19 @@ public class ResourceManager {
 				}
 				else if (el.name.equals("canvas"))
 					map.parseCanvas(el.data);
+				else if (el.name.equals("entity")) {
+
+					GameEntity entity = null;
+
+					for (Node entityEl : el.children) {
+						if (entityEl.name.equals("file")) {
+							entity = loadEntity(entityEl.readString());
+						}
+						else if (entityEl.name.equals("position"))
+							entity.setPosition(entityEl.readFloatArray());
+					}
+					gameHandle.addEntity(entity);
+				}
 			}
 		}
 		return map;

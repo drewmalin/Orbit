@@ -1,6 +1,7 @@
 package com.orbit.core;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -14,6 +15,7 @@ public class Game {
 	public ResourceManager resourceManager;
 	public NetworkManager networkManager;
 	public TextureManager textureManager;
+	public ScriptManager scriptManager;
 	//-----------------------------------//
 	
 	public Camera camera;
@@ -32,7 +34,9 @@ public class Game {
 		networkManager 	= new NetworkManager(this);
 		camera			= new Camera(this);
 		textureManager 	= new TextureManager(this);
+		scriptManager	= new ScriptManager(this);
 		gameEntities 	= new ArrayList<GameEntity>();
+		
 	}
 	
 	public void initGame() {
@@ -92,7 +96,7 @@ public class Game {
 	}
 	
 	public void addEntity(GameEntity ge) {
-		ge.id = -1;
+		ge.id = gameEntities.size() + 1;
 		gameEntities.add(ge);
 	}
 	
@@ -114,5 +118,34 @@ public class Game {
 		}
 		
 		Display.destroy();
+	}
+	
+	// when playerfocus entity interacts with this entity
+	public void onInteract(GameEntity ge) {
+		
+		if (ge.scriptFile != "") {
+			scriptManager.run(ge.scriptFile);
+			if (scriptManager.entityScript.onInteract() != null) {
+				String lvl = scriptManager.entityScript.onInteract().get("level").toString();
+				
+				if (lvl != null) changeLevel(lvl);
+			}
+		}
+	}
+	
+	public void changeLevel(String lvlFile) {
+
+		GameEntity temp = playerFocusEntity;
+		gameEntities.clear();
+		gameEntities.add(temp);
+
+		GameMap map = resourceManager.loadMap("res/maps/"+lvlFile);
+		setLevel(map);
+		int startX = (currentLevel.mapWidth * currentLevel.tileDimensions)/2;
+		int startY = (currentLevel.mapHeight * currentLevel.tileDimensions)/2;
+
+		playerFocusEntity.setPosition(new float[]{startX, startY, 0});
+		camera.setLocation(new Vector3f(startX, startY, 0));
+
 	}
 }
