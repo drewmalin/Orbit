@@ -1,0 +1,7 @@
+<entity>
+    <width>30</width>
+    <height>30</height>
+    <mass>-1</mass>
+    <animationFile>res/entities/PortalAnimations.xml</animationFile>
+    <scriptFile>res/scripts/Entity1.py</scriptFile>
+</entity>

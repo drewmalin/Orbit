@@ -1,0 +1,6 @@
+<entity>
+    <width>30</width>
+    <height>30</height>
+    <mass>.5</mass>
+    <animationFile>res/entities/TestAnimations.xml</animationFile>
+</entity>
