@@ -21,7 +21,7 @@ public class GraphicsManager {
 	private int MSAA				= 0;
 	private String title			= "Lezend";
 	
-	private Game gameHandle;
+	private final Game gameHandle;
 	public final int border = 30;
 
 	public GraphicsManager(Game g) {
@@ -49,9 +49,9 @@ public class GraphicsManager {
 			GL11.glLoadIdentity();
 			
 			GLU.gluPerspective(frust, (float)windowWidth/(float)windowHeight, zNear, zFar);
-			GLU.gluLookAt(gameHandle.camera.location.x, 
-						  gameHandle.camera.location.y, 
-						  gameHandle.camera.location.z, 
+			GLU.gluLookAt(gameHandle.camera.position.x, 
+						  gameHandle.camera.position.y, 
+						  gameHandle.camera.position.z, 
 						  gameHandle.camera.target.x, 
 						  gameHandle.camera.target.y, 
 						  gameHandle.camera.target.z,
@@ -75,42 +75,6 @@ public class GraphicsManager {
 		windowHeight = requestH;
 	}
 
-	public void setFullscreen(boolean b) {
-		fullScreen = b;
-	}
-
-	public void setVSync(boolean b) {
-		vSync = b;
-	}
-
-	public void setMSAA(int i) {
-		MSAA = i;
-	}
-
-	public void setTitle(String t) {
-		title = t;
-	}
-	
-	public void setZNear(float z) {
-		zNear = z;
-	}
-	
-	public void setZFar(float z) {
-		zFar = z;
-	}
-	
-	public void setFrust(float f) {
-		frust = f;
-	}
-	
-	public int getWidth() {
-		return windowWidth;
-	}
-	
-	public int getHeight() {
-		return windowHeight;
-	}
-	
 	public void create(String gmode) {		
 		try {
 			Display.setDisplayMode(new DisplayMode( windowWidth, windowHeight ));
@@ -145,10 +109,12 @@ public class GraphicsManager {
 		}		
 	}
 
+	/**
+	 * Draws the current scene. First sets up the texture parameters to ensure proper rendering/
+	 * blending of adjacent textures. Next, the scene is translated to the middle of the map, then
+	 * to the position of the camera. Finally, each elevation level in the current GameMap is rendered.
+	 */
 	public void drawGame() {
-		
-		int dim = gameHandle.currentLevel.tileDimensions;
-		cleanEntities();
 		
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
@@ -158,39 +124,94 @@ public class GraphicsManager {
 		
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
+		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		GL11.glTranslatef(windowWidth/2, windowHeight/2, 0);
-		GL11.glTranslatef(-gameHandle.camera.location.x, 
-						  -gameHandle.camera.location.y, 
-						  -gameHandle.camera.location.z);
+		GL11.glTranslatef(-gameHandle.camera.position.x, 
+						  -gameHandle.camera.position.y, 
+						  -gameHandle.camera.position.z);
 		
-		for (int row = 0; row < gameHandle.currentLevel.mapData.length; row++) {
-			for (int col = 0; col < gameHandle.currentLevel.mapData[row].length; col++) {
-				for (int tile = 0; tile < gameHandle.currentLevel.mapData[row][col].length; tile++) {
-					gameHandle.currentLevel.tiles.get(gameHandle.currentLevel.mapData[row][col][tile]).draw(col*dim, row*dim);
-				}
-			}
-			
-			for (GameEntity ge : gameHandle.gameEntities) {
+		if (gameHandle.playerFocusEntity.mapLevel > 0)
+			drawBackground();
+		
+		drawCurrentLevel();
+		
+		if (gameHandle.playerFocusEntity.mapLevel + 1 < gameHandle.gameMap.mapCanvas.size())
+			drawForeground();
 
-				if (ge.clean)
-					if (ge.getPosition().y < dim*row) {
-						ge.draw();
-					}
-			}
-		}
-	
 		GL11.glPopMatrix();
 	}
 	
-	public void cleanEntities() {
+	/**
+	 * Draws the current elevation level of the map (that is, the level that the playerFocusEntity
+	 * currently sits at). All entities also at this level will be drawn.
+	 */
+	public void drawCurrentLevel() {
+		int playerLevel = gameHandle.playerFocusEntity.mapLevel;
+		
+		gameHandle.gameMap.drawLevel(playerLevel);
+		
 		for (GameEntity ge : gameHandle.gameEntities) {
-			ge.clean = true;
+			if (ge.mapLevel == playerLevel) ge.draw();
 		}
 	}
 	
-	public void drawEntities() {
-		for (GameEntity ge : gameHandle.gameEntities) {
-			ge.draw();
+	/**
+	 * Draws all elevation levels that are *above* the level that the playerFocusEntity occupies. This
+	 * level will be slightly translated by a factor of its relative distance from the playerFocusEntity's
+	 * level. All entities also at this level will be drawn.
+	 */
+	public void drawForeground() {
+
+		for (int i = gameHandle.playerFocusEntity.mapLevel + 1; i < gameHandle.gameMap.mapCanvas.size(); i++) {
+			GL11.glPushMatrix();
+			GL11.glTranslatef(-gameHandle.camera.position.x * i * .1f, 
+					  	 	  -gameHandle.camera.position.y * i * .1f, 
+					  	 	  -gameHandle.camera.position.z * i * .1f);
+			
+			gameHandle.gameMap.drawLevel(i);
+			
+			for (GameEntity ge : gameHandle.gameEntities) {
+				if (ge.mapLevel == i) ge.draw();
+			}
+			
+			GL11.glPopMatrix();
 		}
 	}
+	
+	/**
+	 * Draws all elevation levels that are *below* the level that the playerFocusEntity occupies. This
+	 * level will be slightly translated (inversely relative to the foreground) by a factor of its relative
+	 * distance from the playerFocusEntity's level. All entities also at this level will be drawn.
+	 */
+	public void drawBackground() {
+		int playerLevel = gameHandle.playerFocusEntity.mapLevel;
+
+		for (int i = 0; i < playerLevel; i++) {
+			GL11.glPushMatrix();
+			GL11.glTranslatef(gameHandle.camera.position.x * (playerLevel - i) * .1f, 
+					  	 	  gameHandle.camera.position.y * (playerLevel - i) * .1f, 
+					  	 	  gameHandle.camera.position.z * (playerLevel - i) * .1f);
+			
+			gameHandle.gameMap.drawLevel(i);
+			
+			for (GameEntity ge : gameHandle.gameEntities) {
+				if (ge.mapLevel == i) ge.draw();
+			}
+			
+			GL11.glPopMatrix();
+		}
+	}
+	
+	//------------------ Getters/Setters ------------------//
+	
+	public void setFullscreen(boolean b) { fullScreen = b; }
+	public void setVSync(boolean b) 	 { vSync = b; }
+	public void setMSAA(int i) 			 { MSAA = i; }
+	public void setTitle(String t)     	 { title = t;}
+	public void setZNear(float z) 		 { zNear = z; }
+	public void setZFar(float z) 		 { zFar = z; }
+	public void setFrust(float f) 	  	 { frust = f; }
+	
+	public int getWidth() 				 { return windowWidth; }
+	public int getHeight()  			 { return windowHeight; }
 }

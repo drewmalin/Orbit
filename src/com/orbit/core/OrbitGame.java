@@ -20,9 +20,7 @@ public class OrbitGame extends Game {
 	 */
 	@Override
 	public void initGame() {
-		
-		multiplayer = false;
-		
+				
 		inputManager.setKeyboardListener(keyboardListener);
 		inputManager.setMouseListener(mouseListener);
 		
@@ -43,12 +41,11 @@ public class OrbitGame extends Game {
 		GameMap map = resourceManager.loadMap("res/maps/Level1.xml");
 		setLevel(map);
 		
-		int startX = (currentLevel.mapWidth * currentLevel.tileDimensions)/2;
-		int startY = (currentLevel.mapHeight * currentLevel.tileDimensions)/2;
+		int startX = (gameMap.mapCanvas.get(playerFocusEntity.mapLevel).mapWidth * gameMap.tileDimensions)/2;
+		int startY = (gameMap.mapCanvas.get(playerFocusEntity.mapLevel).mapHeight * gameMap.tileDimensions)/2;
 
 		playerFocusEntity.setPosition(new float[]{startX, startY, 0});
-		camera.setLocation(new Vector3f(startX, startY, 0));
-		
+		camera.setPosition(startX, startY, 0);
 	}
 	
 	private InputListener keyboardListener = new InputListener() {
@@ -56,17 +53,17 @@ public class OrbitGame extends Game {
 			
 			float playerDeltaX = 0, camDeltaX = 0;
 			float playerDeltaY = 0, camDeltaY = 0;
-			boolean lockNS = playerFocusEntity.cameraLockNS(currentLevel, graphicsManager);
-			boolean lockEW = playerFocusEntity.cameraLockEW(currentLevel, graphicsManager);
+			boolean lockNS = playerFocusEntity.cameraLockNS(gameMap, graphicsManager);
+			boolean lockEW = playerFocusEntity.cameraLockEW(gameMap, graphicsManager);
 			
 			while (Keyboard.next()) {
 				if (Keyboard.getEventKeyState()) {
 					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) 
 						System.exit(0);
-					else if (Keyboard.getEventKey() == Keyboard.KEY_0) { 
-						//**Temporary: testing swapping game levels **//
-						changeLevel("Level2.xml");
-					}
+					else if (Keyboard.getEventKey() == Keyboard.KEY_0)
+						playerFocusEntity.mapLevel = 0;
+					else if (Keyboard.getEventKey() == Keyboard.KEY_1)
+						playerFocusEntity.mapLevel = 1;
 				}
 				
 			}
@@ -76,83 +73,43 @@ public class OrbitGame extends Game {
 				playerDeltaX = -1 * diagonal;
 				if (lockNS) camDeltaY = playerDeltaY;
 				if (lockEW) camDeltaX = playerDeltaX;
-				/*
-				if (lockNS) camera.translateY(-1 * diagonal);
-				if (lockEW) camera.translateX(-1 * diagonal);
-				playerFocusEntity.moveY(-1 * diagonal, currentLevel);
-				playerFocusEntity.moveX(-1 * diagonal, currentLevel);
-				*/
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_W) && Keyboard.isKeyDown(Keyboard.KEY_D)) {
 				playerDeltaY = -1 * diagonal;
 				playerDeltaX =  1 * diagonal;
 				if (lockNS) camDeltaY = playerDeltaY;
 				if (lockEW) camDeltaX = playerDeltaX;
-				/*
-				if (lockNS) camera.translateY(-1 * diagonal);
-				if (lockEW) camera.translateX(1 * diagonal);
-				playerFocusEntity.moveY(-1 * diagonal, currentLevel);
-				playerFocusEntity.moveX(1 * diagonal, currentLevel);
-				*/
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S) && Keyboard.isKeyDown(Keyboard.KEY_A)) {
 				playerDeltaY =  1 * diagonal;
 				playerDeltaX = -1 * diagonal;
 				if (lockNS) camDeltaY = playerDeltaY;
 				if (lockEW) camDeltaX = playerDeltaX;
-				/*
-				if (lockNS) camera.translateY(1 * diagonal);
-				if (lockEW) camera.translateX(-1 * diagonal);
-				playerFocusEntity.moveY(1 * diagonal, currentLevel);
-				playerFocusEntity.moveX(-1 * diagonal, currentLevel);
-				*/
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S) && Keyboard.isKeyDown(Keyboard.KEY_D)) {
 				playerDeltaY = 1 * diagonal;
 				playerDeltaX = 1 * diagonal;
 				if (lockNS) camDeltaY = playerDeltaY;
 				if (lockEW) camDeltaX = playerDeltaX;
-				/*
-				if (lockNS) camera.translateY(1 * diagonal);
-				if (lockEW) camera.translateX(1 * diagonal);
-				playerFocusEntity.moveY(1 * diagonal, currentLevel);
-				playerFocusEntity.moveX(1 * diagonal, currentLevel);
-				*/
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
 				playerDeltaY = -1;
 				if (lockNS) camDeltaY = playerDeltaY;
-				/*
-				if (lockNS) camera.translateY(-1);
-				playerFocusEntity.moveY(-1, currentLevel);
-				*/
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_north"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
 				playerDeltaX = -1;
 				if (lockEW) camDeltaX = playerDeltaX;
-				/*
-				if (lockEW) camera.translateX(-1);
-				playerFocusEntity.moveX(-1, currentLevel);
-				*/
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_west"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
 				playerDeltaY = 1;
 				if (lockNS) camDeltaY = playerDeltaY;
-				/*
-				if (lockNS) camera.translateY(1);
-				playerFocusEntity.moveY(1, currentLevel);
-				*/
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_south"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
 				playerDeltaX = 1;
 				if (lockEW) camDeltaX = playerDeltaX;
-				/*
-				if (lockEW) camera.translateX(1);
-				playerFocusEntity.moveX(1, currentLevel);
-				*/
 				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_east"));
 			}
 			else {
@@ -160,8 +117,8 @@ public class OrbitGame extends Game {
 			}
 			
 			float mult = 1;
-			if (playerDeltaX != 0) mult = playerFocusEntity.moveX(playerDeltaX);
-			if (playerDeltaY != 0) mult = playerFocusEntity.moveY(playerDeltaY);
+			if (playerDeltaX != 0) mult = playerFocusEntity.translateX(playerDeltaX);
+			if (playerDeltaY != 0) mult = playerFocusEntity.translateY(playerDeltaY);
 			if (camDeltaX != 0) camera.translateX(camDeltaX * mult);
 			if (camDeltaY != 0) camera.translateY(camDeltaY * mult);
 

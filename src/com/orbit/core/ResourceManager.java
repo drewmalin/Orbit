@@ -12,6 +12,13 @@ public class ResourceManager {
 		gameHandle = g;
 	}
 
+	/**
+	 * Loads from an external resource file a new GameEntity object for use
+	 * within the game. This method will parse the given XML file and instantiate
+	 * a new GameEntity object, returning it to the calling context.
+	 * @param file
+	 * @return The newly created GameEntity
+	 */
 	public GameEntity loadEntity(String file) {
 
 		XMLParser entityFile = new XMLParser(file);
@@ -41,6 +48,14 @@ public class ResourceManager {
 		return entity;
 	}
 
+	/**
+	 * Loads from an external file a new GameMap object for use within the
+	 * game. A GameMap is the primary object which house each MapCanvas object
+	 * (that is, each elevation level in the map) and in turn, each MapTile object
+	 * (that is, each unique texture block).
+	 * @param file
+	 * @return The newly created GameMap
+	 */
 	public GameMap loadMap(String file) {
 
 		XMLParser mapFile = new XMLParser(file);
@@ -82,32 +97,5 @@ public class ResourceManager {
 			}
 		}
 		return map;
-	}
-
-	public void updateFromPacket(GameEntity gameEntity, Packet p) {
-		gameEntity.setPosition(new float[] {p.x, p.y, p.z});
-		gameEntity.setRotation(new float[] {p.rx, p.ry, p.rz});
-		gameEntity.setHeight(p.height);
-		gameEntity.setWidth(p.width);
-	}
-
-	public Packet packetify(GameEntity ge) {
-		Packet p = new Packet();
-		
-		p.width = ge.getWidth();
-		p.height = ge.getHeight();
-		p.file = ge.getFile();
-		
-		Vector3f temp = ge.getPosition();
-		p.x = temp.x;
-		p.y = temp.y;
-		p.z = temp.z;
-		temp = ge.getRotation();
-		p.rx = temp.x;
-		p.ry = temp.y;
-		p.rz = temp.z;
-		
-		p.id = ge.id;
-		return p;		
 	}
 }

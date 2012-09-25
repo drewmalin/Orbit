@@ -23,9 +23,15 @@ public class MapTile {
 		file = "";
 	}
 
+	/**
+	 * @param x
+	 * @param y
+	 * Draws the MapTile object at the specified x,y location. No modelview
+	 * matrix transformations are performed.
+	 */
 	public void draw(int x, int y) {
 		if (texture != null) texture.bind();	
-		
+
 		GL11.glBegin(GL11.GL_QUADS);
 			GL11.glTexCoord2f(0f, 0f);
 			GL11.glVertex2f(x, y);
@@ -41,6 +47,11 @@ public class MapTile {
 		GL11.glEnd();
 	}
 
+	/**
+	 * @param file
+	 * Loads a texture file for this particular MapTile object. PNG files
+	 * seem to work well for this.
+	 */
 	public void loadTexture(String file) {
 		try {
 			String type = file.substring(file.indexOf(".") + 1).toUpperCase();

@@ -21,7 +21,7 @@ public class Game {
 	public Camera camera;
 	public ArrayList<GameEntity> gameEntities;
 	public GameEntity playerFocusEntity;
-	public GameMap currentLevel;
+	public GameMap gameMap;
 	
 	public boolean multiplayer;
 	public final float diagonal = .70710678f;
@@ -50,7 +50,7 @@ public class Game {
 		graphicsManager.setZFar(100f);
 		graphicsManager.create("3D");
 		
-		camera.setLocation(new Vector3f(0f, 0f, 0f));
+		camera.setPosition(0f, 0f, 0f);
 		camera.setTarget(new Vector3f(0f, 0f, 0f));
 		
 	}
@@ -92,7 +92,7 @@ public class Game {
 	}
 	
 	public void setLevel(GameMap map) {
-		currentLevel = map;
+		gameMap = map;
 	}
 	
 	public void addEntity(GameEntity ge) {
@@ -141,11 +141,10 @@ public class Game {
 
 		GameMap map = resourceManager.loadMap("res/maps/"+lvlFile);
 		setLevel(map);
-		int startX = (currentLevel.mapWidth * currentLevel.tileDimensions)/2;
-		int startY = (currentLevel.mapHeight * currentLevel.tileDimensions)/2;
+		int startX = (gameMap.mapWidth * gameMap.tileDimensions)/2;
+		int startY = (gameMap.mapHeight * gameMap.tileDimensions)/2;
 
 		playerFocusEntity.setPosition(new float[]{startX, startY, 0});
-		camera.setLocation(new Vector3f(startX, startY, 0));
-
+		camera.setPosition(startX, startY, 0);
 	}
 }
