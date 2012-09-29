@@ -16,6 +16,7 @@ public class Game {
 	public NetworkManager networkManager;
 	public TextureManager textureManager;
 	public ScriptManager scriptManager;
+	public ShaderManager shaderManager;
 	//-----------------------------------//
 	
 	public Camera camera;
@@ -36,7 +37,7 @@ public class Game {
 		textureManager 	= new TextureManager(this);
 		scriptManager	= new ScriptManager(this);
 		gameEntities 	= new ArrayList<GameEntity>();
-		
+		shaderManager 	= new ShaderManager(this);
 	}
 	
 	public void initGame() {
@@ -141,8 +142,8 @@ public class Game {
 
 		GameMap map = resourceManager.loadMap("res/maps/"+lvlFile);
 		setLevel(map);
-		int startX = (gameMap.mapWidth * gameMap.tileDimensions)/2;
-		int startY = (gameMap.mapHeight * gameMap.tileDimensions)/2;
+		int startX = (gameMap.mapCanvas.get(playerFocusEntity.mapLevel).mapWidth * gameMap.tileDimensions)/2;
+		int startY = (gameMap.mapCanvas.get(playerFocusEntity.mapLevel).mapHeight * gameMap.tileDimensions)/2;
 
 		playerFocusEntity.setPosition(new float[]{startX, startY, 0});
 		camera.setPosition(startX, startY, 0);

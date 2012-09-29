@@ -3,11 +3,11 @@ package com.orbit.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.lwjgl.opengl.GL11;
+
 public class GameMap {
 
 	public int tileDimensions;
-	public int mapWidth;
-	public int mapHeight;
 	
 	public final ArrayList<MapCanvas> mapCanvas;
 	public final HashMap<Integer, MapTile> tiles;
@@ -88,11 +88,11 @@ public class GameMap {
 	 * to the screen. 
 	 */
 	public void drawLevel(int level) {
-		
 		for (int row = 0; row < mapCanvas.get(level).mapData.length; row++) {
 			for (int col = 0; col < mapCanvas.get(level).mapData[row].length; col++) {
 				//Do not bother drawing invisible tiles
 				if (mapCanvas.get(level).mapData[row][col][0] != -1) {
+					//Calculate the color of the tile based on the light sources
 					for (int tile = 0; tile < mapCanvas.get(level).mapData[row][col].length; tile++) {
 						tiles.get(mapCanvas.get(level).mapData[row][col][tile]).draw(col * tileDimensions, row * tileDimensions);
 					}
@@ -100,5 +100,4 @@ public class GameMap {
 			}
 		}
 	}
-	
 }

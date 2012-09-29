@@ -26,7 +26,9 @@ public class OrbitGame extends Game {
 		
 		graphicsManager.setResolution(800, 600);
 		graphicsManager.create("2D");
-				
+		
+		shaderManager.init("res/shaders/orbit.frag", "res/shaders/orbit.vert");
+		
 		GameEntity player = resourceManager.loadEntity("res/entities/Player.xml");
 		addEntity(player);
 		setFocusEntity(player);

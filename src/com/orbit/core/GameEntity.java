@@ -17,12 +17,14 @@ public class GameEntity extends Moveable {
 	public int id;
 	private Texture texture;
 	public String animationFile;
+	public float lightRadius;
 	
 	public GameEntity(Game g) {
 		gameHandle = g;
 		position = new Vector3f(0, 0, 0);
 		rotation = new Vector3f(0, 0, 0);
 		width = height = 0;
+		lightRadius = 0;
 		animationFile = null;
 		scriptFile = null;
 		mass = -1;

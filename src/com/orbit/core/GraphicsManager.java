@@ -1,10 +1,15 @@
 package com.orbit.core;
 
+import java.nio.FloatBuffer;
+import java.util.Random;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.Pbuffer;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
@@ -23,7 +28,7 @@ public class GraphicsManager {
 	
 	private final Game gameHandle;
 	public final int border = 30;
-
+	
 	public GraphicsManager(Game g) {
 		gameHandle = g;
 	}
@@ -41,6 +46,7 @@ public class GraphicsManager {
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, windowWidth, windowHeight, 0, -1, 1);
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			GL11.glShadeModel(GL11.GL_SMOOTH);
 		}
 		
 		else if (string.equals("3D")) {
@@ -147,12 +153,30 @@ public class GraphicsManager {
 	 */
 	public void drawCurrentLevel() {
 		int playerLevel = gameHandle.playerFocusEntity.mapLevel;
+		int c = 0;
+		gameHandle.shaderManager.bind();
 		
+		for (GameEntity ge : gameHandle.gameEntities) {
+			if (ge.mapLevel == playerLevel) {
+				gameHandle.shaderManager.parmData.put((windowWidth/2) + ge.position.x - gameHandle.camera.position.x + ge.width/2);
+				gameHandle.shaderManager.parmData.put((windowHeight/2) + ge.position.y - gameHandle.camera.position.y + ge.height/2);
+				gameHandle.shaderManager.parmData.put(ge.position.z);
+				gameHandle.shaderManager.parmData.put(20f);
+			}
+		}
+
+		gameHandle.shaderManager.persistParmData(playerLevel);
+				
 		gameHandle.gameMap.drawLevel(playerLevel);
+		
+		gameHandle.shaderManager.parmData.clear();
+		gameHandle.shaderManager.unbind();
 		
 		for (GameEntity ge : gameHandle.gameEntities) {
 			if (ge.mapLevel == playerLevel) ge.draw();
 		}
+		
+		
 	}
 	
 	/**
@@ -168,7 +192,11 @@ public class GraphicsManager {
 					  	 	  -gameHandle.camera.position.y * i * .1f, 
 					  	 	  -gameHandle.camera.position.z * i * .1f);
 			
+			gameHandle.shaderManager.bind();
+			gameHandle.shaderManager.persistParmData(i);
 			gameHandle.gameMap.drawLevel(i);
+			gameHandle.shaderManager.parmData.clear();
+			gameHandle.shaderManager.unbind();
 			
 			for (GameEntity ge : gameHandle.gameEntities) {
 				if (ge.mapLevel == i) ge.draw();
@@ -192,7 +220,11 @@ public class GraphicsManager {
 					  	 	  gameHandle.camera.position.y * (playerLevel - i) * .1f, 
 					  	 	  gameHandle.camera.position.z * (playerLevel - i) * .1f);
 			
+			gameHandle.shaderManager.bind();
+			gameHandle.shaderManager.persistParmData(i);
 			gameHandle.gameMap.drawLevel(i);
+			gameHandle.shaderManager.parmData.clear();
+			gameHandle.shaderManager.unbind();
 			
 			for (GameEntity ge : gameHandle.gameEntities) {
 				if (ge.mapLevel == i) ge.draw();
