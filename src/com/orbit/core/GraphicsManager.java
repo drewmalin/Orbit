@@ -161,7 +161,7 @@ public class GraphicsManager {
 				gameHandle.shaderManager.parmData.put((windowWidth/2) + ge.position.x - gameHandle.camera.position.x + ge.width/2);
 				gameHandle.shaderManager.parmData.put((windowHeight/2) + ge.position.y - gameHandle.camera.position.y + ge.height/2);
 				gameHandle.shaderManager.parmData.put(ge.position.z);
-				gameHandle.shaderManager.parmData.put(20f);
+				gameHandle.shaderManager.parmData.put(ge.lightRadius);
 			}
 		}
 

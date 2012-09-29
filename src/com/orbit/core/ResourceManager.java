@@ -1,8 +1,5 @@
 package com.orbit.core;
 
-import java.util.Random;
-
-import org.lwjgl.util.vector.Vector3f;
 
 public class ResourceManager {
 	
@@ -42,6 +39,8 @@ public class ResourceManager {
 				else if (el.name.equals("scriptFile")) {
 					entity.setScriptFile(el.readString());
 				}
+				else if (el.name.equals("lightRadius"))
+					entity.setLightRadius(el.readFloat());
 			}
 		}
 

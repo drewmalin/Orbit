@@ -224,6 +224,7 @@ public class GameEntity extends Moveable {
 	public void setHeight(int h) 	    { height = h; }
 	public void setTexture(Texture tex) { texture = tex; }
 	public void setMass(float m) 		{ mass = m; }
+	public void setLightRadius(float f) { lightRadius = f; }
 
 	public int getWidth()            { return width; }
 	public int getHeight() 			 { return height; }
@@ -231,4 +232,5 @@ public class GameEntity extends Moveable {
 	public Vector3f getRotation() 	 { return rotation; }
 	public String getFile() 		 { return file; }
 	public String getAnimationFile() { return animationFile; }
+
 }
