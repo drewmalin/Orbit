@@ -1,5 +1,6 @@
 <map>
     <tileDimensions>32</tileDimensions>
+    <lightLevel>0.2</lightLevel>
     <tile>
     	<id>0</id>
     	<file>res/textures/ground_32.png</file>

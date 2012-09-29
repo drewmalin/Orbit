@@ -66,6 +66,8 @@ public class ResourceManager {
 			for (Node el : mapEl.children) {
 				if (el.name.equals("tileDimensions"))
 					map.setTileDimension(el.readInt());
+				else if (el.name.equals("lightLevel"))
+					map.setLightLevel(el.readFloat());
 				else if (el.name.equals("tile")) {
 					MapTile mt = new MapTile();
 					for (Node tileChild : el.children) {

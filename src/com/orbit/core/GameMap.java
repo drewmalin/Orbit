@@ -1,5 +1,6 @@
 package com.orbit.core;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 public class GameMap {
 
 	public int tileDimensions;
+	public float lightLevel;
 	
 	public final ArrayList<MapCanvas> mapCanvas;
 	public final HashMap<Integer, MapTile> tiles;
@@ -30,6 +32,8 @@ public class GameMap {
 		invisibleTile.collidable = true;
 		
 		tiles.put(-1, invisibleTile);
+		
+		lightLevel = 1;
 	}
 	
 	/**
@@ -79,6 +83,15 @@ public class GameMap {
 	 */
 	public void setTileDimension(int data) {
 		tileDimensions = data;
+	}
+	
+	/**
+	 * @param data
+	 * Save the light level of the map as a whole. If the light level is not
+	 * set, the default of 1 will be used.
+	 */
+	public void setLightLevel(float data) {
+		lightLevel = data;
 	}
 
 	/**

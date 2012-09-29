@@ -44,6 +44,9 @@ public class ShaderManager {
 		location = GL20.glGetUniformLocation(shaderProgram, "screenHeight");
 		GL20.glUniform1i(location, gameHandle.graphicsManager.getHeight());
 		
+		location = GL20.glGetUniformLocation(shaderProgram, "defaultLevel");
+		GL20.glUniform1f(location, gameHandle.gameMap.lightLevel);
+		
 		int count = 0;
 		for (GameEntity ge : gameHandle.gameEntities)
 			if (ge.mapLevel == lvl)
@@ -51,6 +54,7 @@ public class ShaderManager {
 		
 		location = GL20.glGetUniformLocation(shaderProgram, "count");
 		GL20.glUniform1i(location, count);
+		
 	}
 	
 	public void init(String frag, String vert) {
