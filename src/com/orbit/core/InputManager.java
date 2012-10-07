@@ -28,15 +28,29 @@ public class InputManager {
 	}
 	
 	public void pollKeyboard() {
-		keyboardListener.onEvent();
+		if (gameHandle.windowManager.windowStack.size() > 0) {
+			gameHandle.windowManager.pollKeyboard();
+		}
+		else {
+			keyboardListener.onEvent();
+		}
 	}
 	
 	public void pollMouse() {
+		
+		// Poll GUI, steal context if menu stack size > 0
+		gameHandle.windowManager.pollMouse();
+		
+		// Regular game mouse polling
 		while (Mouse.next()) {
 			if (Mouse.getEventButtonState()) {
 				mouseListener.onEvent(Mouse.getEventButton(), Mouse.getX(), Mouse.getY());
 			}
+			// Make sure the wheel delta doesn't go crazy
+			Mouse.getDWheel();
 		}
+		
+		
 	}
 
 	public void addKeyTrigger(int key, KeyTrigger keyTrigger) {

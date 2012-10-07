@@ -17,6 +17,7 @@ public class Game {
 	public TextureManager textureManager;
 	public ScriptManager scriptManager;
 	public ShaderManager shaderManager;
+	public WindowManager windowManager;
 	//-----------------------------------//
 	
 	public Camera camera;
@@ -38,6 +39,7 @@ public class Game {
 		scriptManager	= new ScriptManager(this);
 		gameEntities 	= new ArrayList<GameEntity>();
 		shaderManager 	= new ShaderManager(this);
+		windowManager 	= new WindowManager(this);
 	}
 	
 	public void initGame() {
@@ -113,6 +115,8 @@ public class Game {
 			graphicsManager.drawGame();
 			
 			if (multiplayer) networkManager.put.work();
+			
+			windowManager.draw();
 			
 			Display.update();
 			Display.sync(60);

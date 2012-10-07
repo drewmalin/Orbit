@@ -2,5 +2,6 @@
     <width>30</width>
     <height>30</height>
     <mass>.5</mass>
+    <lightRadius>20</lightRadius>
     <animationFile>res/entities/TestAnimations.xml</animationFile>
 </entity>

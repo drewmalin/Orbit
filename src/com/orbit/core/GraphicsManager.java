@@ -44,7 +44,7 @@ public class GraphicsManager {
 			GL11.glEnable(GL11.GL_TEXTURE_2D);	
 			
 			GL11.glLoadIdentity();
-			GL11.glOrtho(0, windowWidth, windowHeight, 0, -1, 1);
+			GL11.glOrtho(0, windowWidth + gameHandle.windowManager.gui.get("storyBox").width, windowHeight, 0, -1, 1);
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
 			GL11.glShadeModel(GL11.GL_SMOOTH);
 		}
@@ -83,7 +83,7 @@ public class GraphicsManager {
 
 	public void create(String gmode) {		
 		try {
-			Display.setDisplayMode(new DisplayMode( windowWidth, windowHeight ));
+			Display.setDisplayMode(new DisplayMode( windowWidth + gameHandle.windowManager.gui.get("storyBox").width, windowHeight ));
 			if (fullScreen) {
 				for (DisplayMode dm : Display.getAvailableDisplayModes()) {
 					if (dm.toString().contains(windowWidth + " x " + windowHeight + " x " + 32)) {
@@ -175,7 +175,6 @@ public class GraphicsManager {
 		for (GameEntity ge : gameHandle.gameEntities) {
 			if (ge.mapLevel == playerLevel) ge.draw();
 		}
-		
 		
 	}
 	
