@@ -1,17 +1,23 @@
 package com.orbit.core;
 
+import java.util.ArrayList;
+
 import com.orbit.xml.Node;
 import com.orbit.xml.XMLParser;
 
 
-public class ResourceManager {
+public enum ResourceManager {
 	
-	private Game gameHandle;
+	MANAGER;
 	
-	public ResourceManager(Game g) {
-		gameHandle = g;
+	public ArrayList<GameEntity> gameEntities;
+	public GameEntity playerFocusEntity;
+	
+	ResourceManager() {
+		gameEntities = new ArrayList<GameEntity>();
+		playerFocusEntity = new GameEntity();
 	}
-
+	
 	/**
 	 * Loads from an external resource file a new GameEntity object for use
 	 * within the game. This method will parse the given XML file and instantiate
@@ -23,7 +29,8 @@ public class ResourceManager {
 
 		XMLParser entityFile = new XMLParser(file);
 		
-		GameEntity entity = new GameEntity(gameHandle);
+		GameEntity entity = new GameEntity();
+		
 		entity.setFile(file);
 		
 		for (Node entityEl : entityFile.root.children) {
@@ -58,18 +65,16 @@ public class ResourceManager {
 	 * @param file
 	 * @return The newly created GameMap
 	 */
-	public GameMap loadMap(String file) {
+	public void loadMap(String file) {
 
 		XMLParser mapFile = new XMLParser(file);
-		
-		GameMap map = new GameMap();
 		
 		for (Node mapEl : mapFile.root.children) {
 			for (Node el : mapEl.children) {
 				if (el.name.equals("tileDimensions"))
-					map.setTileDimension(el.readInt());
+					GameMap.MAP.setTileDimension(el.readInt());
 				else if (el.name.equals("lightLevel"))
-					map.setLightLevel(el.readFloat());
+					GameMap.MAP.setLightLevel(el.readFloat());
 				else if (el.name.equals("tile")) {
 					MapTile mt = new MapTile();
 					for (Node tileChild : el.children) {
@@ -80,11 +85,11 @@ public class ResourceManager {
 						else if (tileChild.name.equals("collidable"))
 							mt.collidable = tileChild.readBoolean();
 					}
-					mt.width = mt.height = map.tileDimensions;
-					map.tiles.put(mt.id, mt);
+					mt.width = mt.height = GameMap.MAP.tileDimensions;
+					GameMap.MAP.tiles.put(mt.id, mt);
 				}
 				else if (el.name.equals("canvas"))
-					map.parseCanvas(el.data);
+					GameMap.MAP.parseCanvas(el.data);
 				else if (el.name.equals("entity")) {
 
 					GameEntity entity = null;
@@ -96,16 +101,38 @@ public class ResourceManager {
 						else if (entityEl.name.equals("position"))
 							entity.setPosition(entityEl.readFloatArray());
 					}
-					gameHandle.addEntity(entity);
+					addEntity(entity);
 				}
 				else if (el.name.equals("player")) {
 					for (Node playerNode : el.children) {
 						if (playerNode.name.equals("position"))
-							gameHandle.playerFocusEntity.setPosition(playerNode.readFloatArray());
+							MANAGER.playerFocusEntity.setPosition(playerNode.readFloatArray());
 					}
 				}
 			}
 		}
-		return map;
+	}
+	
+	public void addEntity(GameEntity ge) {
+		ge.id = MANAGER.gameEntities.size() + 1;
+		MANAGER.gameEntities.add(ge);
+	}
+	
+	public void changeLevel(String lvlFile) {
+		
+		GraphicsManager.MANAGER.fadeToBlack();
+		
+		GameEntity temp = MANAGER.playerFocusEntity;
+		MANAGER.gameEntities.clear();
+		MANAGER.gameEntities.add(temp);
+
+		loadMap("res/maps/"+lvlFile);
+		Camera.CAMERA.findPlayer();
+		
+		GraphicsManager.MANAGER.fadeIn();
+	}
+	
+	public void setFocusEntity(GameEntity ge) {
+		MANAGER.playerFocusEntity = ge;
 	}
 }

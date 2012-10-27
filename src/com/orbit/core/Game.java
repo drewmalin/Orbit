@@ -8,54 +8,29 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
 public class Game {
-	
+		
 	//------  Component Managers  -------//
-	public InputManager inputManager;
-	public GraphicsManager graphicsManager;
-	public ResourceManager resourceManager;
 	public NetworkManager networkManager;
-	public TextureManager textureManager;
-	public ScriptManager scriptManager;
-	public ShaderManager shaderManager;
-	public WindowManager windowManager;
 	//-----------------------------------//
 	
-	public Camera camera;
-	public ArrayList<GameEntity> gameEntities;
-	public GameEntity playerFocusEntity;
-	public GameMap gameMap;
-	
 	public boolean multiplayer;
-	
 	public final float diagonal = .70710678f;
 
-	public Game() {
-		
-		inputManager 	= new InputManager(this);
-		graphicsManager = new GraphicsManager(this);
-		resourceManager = new ResourceManager(this);
-		networkManager 	= new NetworkManager(this);
-		camera			= new Camera(this);
-		textureManager 	= new TextureManager(this);
-		scriptManager	= new ScriptManager(this);
-		gameEntities 	= new ArrayList<GameEntity>();
-		shaderManager 	= new ShaderManager(this);
-		windowManager 	= new WindowManager(this);
-	}
+	public Game() {}
 	
 	public void initGame() {
 
-		inputManager.setKeyboardListener(keyboardListener);
-		inputManager.setMouseListener(mouseListener);
+		InputManager.MANAGER.setKeyboardListener(keyboardListener);
+		InputManager.MANAGER.setMouseListener(mouseListener);
 		
-		graphicsManager.setResolution(800, 600);
-		graphicsManager.setFrust(60f);
-		graphicsManager.setZNear(0.1f);
-		graphicsManager.setZFar(100f);
-		graphicsManager.create("3D");
+		GraphicsManager.MANAGER.setResolution(800, 600);
+		GraphicsManager.MANAGER.setFrust(60f);
+		GraphicsManager.MANAGER.setZNear(0.1f);
+		GraphicsManager.MANAGER.setZFar(100f);
+		GraphicsManager.MANAGER.create("3D");
 		
-		camera.setPosition(0f, 0f, 0f);
-		camera.setTarget(new Vector3f(0f, 0f, 0f));
+		Camera.CAMERA.setPosition(0f, 0f, 0f);
+		Camera.CAMERA.setTarget(new Vector3f(0f, 0f, 0f));
 		
 	}
 
@@ -91,87 +66,25 @@ public class Game {
 		}
 	};
 	
-	public void setFocusEntity(GameEntity ge) {
-		playerFocusEntity = ge;
-	}
-	
-	public void setLevel(GameMap map) {
-		gameMap = map;
-	}
-	
-	public void addEntity(GameEntity ge) {
-		ge.id = gameEntities.size() + 1;
-		gameEntities.add(ge);
-	}
-	
 	public void start() {
 		
 		initGame();
 		
 		while (!Display.isCloseRequested()) {
 			
-			inputManager.pollKeyboard();
-			inputManager.pollMouse();
+			InputManager.MANAGER.pollKeyboard();
+			InputManager.MANAGER.pollMouse();
 			
-			graphicsManager.drawGame();
+			GraphicsManager.MANAGER.drawGame();
 			
 			if (multiplayer) networkManager.put.work();
 			
-			windowManager.draw();
+			WindowManager.MANAGER.draw();
 			
 			Display.update();
 			Display.sync(60);
 		}
 		
 		Display.destroy();
-	}
-	
-	// when playerfocus entity interacts with this entity
-	public void onInteract(GameEntity ge) {
-		
-		Object queryScript;
-		
-		if (ge.scriptFile != "") {
-
-			scriptManager.run(ge.scriptFile);
-			if (scriptManager.entityScript.onInteract() != null) {
-				
-				queryScript = scriptManager.entityScript.onInteract().get("level");
-				if (queryScript != null) {
-					changeLevel(queryScript.toString());
-				}
-				
-				queryScript = scriptManager.entityScript.onInteract().get("newMessage");
-				if (queryScript != null) {
-					windowManager.gui.get("storyBox").messageBoxes.get(0).replaceMessage(queryScript.toString());
-				}
-				
-				queryScript = scriptManager.entityScript.onInteract().get("appendMessage");
-				if (queryScript != null) {
-					windowManager.gui.get("storyBox").messageBoxes.get(0).addMessage(queryScript.toString());
-				}
-				
-				queryScript = scriptManager.entityScript.onInteract().get("destroy");
-				if (queryScript != null) {
-					if (queryScript.toString().toLowerCase().equals("true"))
-						gameEntities.remove(ge);
-				}
-			}
-		}
-	}
-	
-	public void changeLevel(String lvlFile) {
-		
-		graphicsManager.fadeToBlack();
-		
-		GameEntity temp = playerFocusEntity;
-		gameEntities.clear();
-		gameEntities.add(temp);
-
-		GameMap map = resourceManager.loadMap("res/maps/"+lvlFile);
-		setLevel(map);
-		camera.findPlayer();
-		
-		graphicsManager.fadeIn();
 	}
 }

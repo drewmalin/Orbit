@@ -6,6 +6,7 @@ import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 
+import com.orbit.core.GraphicsManager;
 import com.orbit.core.WindowManager;
 
 public class MessageBox extends Canvas {
@@ -212,7 +213,7 @@ public class MessageBox extends Canvas {
 			parentTop = parent.y;
 		}
 		else {
-			parentBot = windowManagerHandle.gameHandle.graphicsManager.getHeight();
+			parentBot = GraphicsManager.MANAGER.getHeight();
 			parentTop = 0;
 		}
 		
@@ -234,7 +235,7 @@ public class MessageBox extends Canvas {
 			parentTop = parent.y;
 		}
 		else {
-			parentBot = windowManagerHandle.gameHandle.graphicsManager.getHeight();
+			parentBot = GraphicsManager.MANAGER.getHeight();
 			parentTop = 0;
 		}
 		

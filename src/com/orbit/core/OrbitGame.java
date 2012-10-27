@@ -25,16 +25,13 @@ public class OrbitGame extends Game {
 	public void initGame() {
 				
 		// Load input listeners
-		inputManager.setKeyboardListener(keyboardListener);
-		inputManager.setMouseListener(mouseListener);
-		
-		
+		InputManager.MANAGER.setKeyboardListener(keyboardListener);
+		InputManager.MANAGER.setMouseListener(mouseListener);
 		
 		// Create constant GUI
-		
-		Window w = windowManager.createWindow("storyBox", 800, 0).setWidth(350).setHeight(600);
+		Window w = WindowManager.MANAGER.createWindow("storyBox", 800, 0).setWidth(350).setHeight(600);
 		w.setColor(new float[] {0, 0, 0, 1});
-		MessageBox mb = new MessageBox(windowManager, w);
+		MessageBox mb = new MessageBox(WindowManager.MANAGER, w);
 
 		mb.message = "Mr. and Mrs. Dursley, of number four, Privet Drive, were proud to say that they were perfectly normal, thank you very much. They were the last people you'd expect to be involved in anything strange or mysterious, because they just didn't hold with such nonsense.\n\nMr. Dursley was the director of a firm called Grunnings, which made drills. He was a big, beefy man with hardly any neck, although he did have a very large mustache. Mrs. Dursley was thin and blonde and had nearly twice the usual amount of neck, which came in very useful as she spent so much of her time craning over garden fences, spying on the neighbors. The Dursleys had a small son called Dudley and in their opinion there was no finer boy anywhere.";
 		mb.height = 600;
@@ -47,61 +44,62 @@ public class OrbitGame extends Game {
 		mb.setColor(new float[] {0, 0, 0, 1});
 		
 		// Load GraphicsManager
-		graphicsManager.setResolution(800, 600);
-		graphicsManager.create("2D");
+		GraphicsManager.MANAGER.setResolution(800, 600);
+		GraphicsManager.MANAGER.create("2D");
 		
-		windowManager.gui.get("storyBox").messageBoxes.add(mb);
+		WindowManager.MANAGER.gui.get("storyBox").messageBoxes.add(mb);
 		mb.load();
 		mb.fixMessage();
 		
 		// Load game menus
-		windowManager.loadMenu("res/menu/pause.xml");
-		windowManager.createClickListeners();
+		WindowManager.MANAGER.loadMenu("res/menu/pause.xml");
+		WindowManager.MANAGER.createClickListeners();
 		
 		// Load Shaders (must be done after loading of graphicsmanager)
-		shaderManager.init("res/shaders/orbit.frag", "res/shaders/orbit.vert");
+		ShaderManager.MANAGER.init("res/shaders/orbit.frag", "res/shaders/orbit.vert");
 		
 		// Load Main character
-		GameEntity player = resourceManager.loadEntity("res/entities/Player.xml");
-		addEntity(player);
-		setFocusEntity(player);
+		GameEntity player = ResourceManager.MANAGER.loadEntity("res/entities/Player.xml");
+		ResourceManager.MANAGER.addEntity(player);
+		ResourceManager.MANAGER.setFocusEntity(player);
 		
 		try {
-			textureManager.loadCycle(playerFocusEntity, playerFocusEntity.getAnimationFile());
-			player.setTexture(textureManager.setFrame(playerFocusEntity.id, "idle_south"));
+			TextureManager.MANAGER.loadCycle(ResourceManager.MANAGER.playerFocusEntity, ResourceManager.MANAGER.playerFocusEntity.getAnimationFile());
+			player.setTexture(TextureManager.MANAGER.setFrame(ResourceManager.MANAGER.playerFocusEntity.id, "idle_south"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// Load first map
-		GameMap map = resourceManager.loadMap("res/maps/Level1.xml");
-		setLevel(map);
-		camera.findPlayer();
+		ResourceManager.MANAGER.loadMap("res/maps/Level1.xml");
+		Camera.CAMERA.findPlayer();
 	}
 	
 	private InputListener keyboardListener = new InputListener() {
 		public void onEvent() {
 						
+			GameEntity playerFocusEntity = ResourceManager.MANAGER.playerFocusEntity;
+			
 			float mult = 1;
 			float playerDeltaX = 0, camDeltaX = 0;
 			float playerDeltaY = 0, camDeltaY = 0;
-			boolean lockNS = playerFocusEntity.cameraLockNS(gameMap, graphicsManager);
-			boolean lockEW = playerFocusEntity.cameraLockEW(gameMap, graphicsManager);
+			boolean lockNS = ResourceManager.MANAGER.playerFocusEntity.cameraLockNS(GameMap.MAP, GraphicsManager.MANAGER);
+			boolean lockEW = ResourceManager.MANAGER.playerFocusEntity.cameraLockEW(GameMap.MAP, GraphicsManager.MANAGER);
 			
 			while (Keyboard.next()) {
 				if (Keyboard.getEventKeyState()) {
 					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE)
-						windowManager.pushMenuStack("pause");
+						WindowManager.MANAGER.pushMenuStack("pause");
 				}
 			}
 			
-			if (PhysicsUtilities.tileTest(playerFocusEntity, -2, gameMap)) {
+			if (PhysicsUtilities.tileTest(playerFocusEntity, -2, GameMap.MAP)) {
 				//System.out.println(playerFocusEntity.lastMovement);
-				if (playerFocusEntity.lastMovement.x != 0) {
+				if (ResourceManager.MANAGER.playerFocusEntity.lastMovement.x != 0) {
 					playerDeltaX = 2 * playerFocusEntity.lastMovement.x;
 					if (lockEW) camDeltaX = playerDeltaX;
 					mult = playerFocusEntity.translateX(playerDeltaX);
-					camera.translateX(camDeltaX * mult);
+					Camera.CAMERA.translateX(camDeltaX * mult);
 					return;
 				}
 				else if (playerFocusEntity.lastMovement.y != 0) {
@@ -109,7 +107,7 @@ public class OrbitGame extends Game {
 					playerDeltaY = 2 * playerFocusEntity.lastMovement.y;
 					if (lockNS) camDeltaY = playerDeltaY;
 					mult = playerFocusEntity.translateY(playerDeltaY);
-					camera.translateY(camDeltaY * mult);
+					Camera.CAMERA.translateY(camDeltaY * mult);
 					return;
 				}
 			}
@@ -141,22 +139,22 @@ public class OrbitGame extends Game {
 			else if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
 				playerDeltaY = -1;
 				if (lockNS) camDeltaY = playerDeltaY;
-				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_north"));
+				playerFocusEntity.setTexture(TextureManager.MANAGER.nextFrame(playerFocusEntity.id, "walk_north"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
 				playerDeltaX = -1;
 				if (lockEW) camDeltaX = playerDeltaX;
-				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_west"));
+				playerFocusEntity.setTexture(TextureManager.MANAGER.nextFrame(playerFocusEntity.id, "walk_west"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
 				playerDeltaY = 1;
 				if (lockNS) camDeltaY = playerDeltaY;
-				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_south"));
+				playerFocusEntity.setTexture(TextureManager.MANAGER.nextFrame(playerFocusEntity.id, "walk_south"));
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
 				playerDeltaX = 1;
 				if (lockEW) camDeltaX = playerDeltaX;
-				playerFocusEntity.setTexture(textureManager.nextFrame(playerFocusEntity.id, "walk_east"));
+				playerFocusEntity.setTexture(TextureManager.MANAGER.nextFrame(playerFocusEntity.id, "walk_east"));
 			}
 			else {
 				playerFocusEntity.idle();
@@ -164,8 +162,8 @@ public class OrbitGame extends Game {
 			
 			if (playerDeltaX != 0) mult = playerFocusEntity.translateX(playerDeltaX);
 			if (playerDeltaY != 0) mult = playerFocusEntity.translateY(playerDeltaY);
-			if (camDeltaX != 0) camera.translateX(camDeltaX * mult);
-			if (camDeltaY != 0) camera.translateY(camDeltaY * mult);
+			if (camDeltaX != 0) Camera.CAMERA.translateX(camDeltaX * mult);
+			if (camDeltaY != 0) Camera.CAMERA.translateY(camDeltaY * mult);
 
 		}
 	};

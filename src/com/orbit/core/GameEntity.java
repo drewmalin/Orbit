@@ -5,7 +5,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 
-public class GameEntity extends Moveable {
+public class GameEntity implements Moveable {
 	
 	public int mapLevel = 0;
 	public int width;
@@ -13,7 +13,6 @@ public class GameEntity extends Moveable {
 	private float mass;
 	private String file;
 	String scriptFile;
-	private Game gameHandle;
 	
 	public int id;
 	private Texture texture;
@@ -21,11 +20,12 @@ public class GameEntity extends Moveable {
 	public float lightRadius;
 	
 	public Vector2f lastMovement;
+	final Vector3f position = new Vector3f(0, 0, 0);
+	final Vector3f rotation = new Vector3f(0, 0, 0);
 	
-	public GameEntity(Game g) {
-		gameHandle = g;
-		position = new Vector3f(0, 0, 0);
-		rotation = new Vector3f(0, 0, 0);
+	public GameEntity() {
+		position.set(0, 0, 0);
+		rotation.set(0, 0, 0);
 		lastMovement = new Vector2f(0, 0);
 		
 		width = height = 0;
@@ -75,16 +75,16 @@ public class GameEntity extends Moveable {
 
 		float multiplier = 1;
 		
-		if (PhysicsUtilities.onMapY(this, delta, gameHandle.gameMap) && 
-				!PhysicsUtilities.tileCollision(this, 0, delta, gameHandle.gameMap)) {
-			for (GameEntity e : gameHandle.gameEntities) {
+		if (PhysicsUtilities.onMapY(this, delta, GameMap.MAP) && 
+				!PhysicsUtilities.tileCollision(this, 0, delta, GameMap.MAP)) {
+			for (GameEntity e : ResourceManager.MANAGER.gameEntities) {
 				if (PhysicsUtilities.entityCollision(this, 0, delta, e)) {
 					if (e.mass >= 0) {
 						multiplier -= e.mass;
 						multiplier *= e.translateY(delta * multiplier);
 					}
-					if (e.scriptFile != null && this == gameHandle.playerFocusEntity) {
-						gameHandle.onInteract(e);
+					if (e.scriptFile != null && this == ResourceManager.MANAGER.playerFocusEntity) {
+						ScriptManager.MANAGER.onInteract(e);
 						break;
 					}
 				}
@@ -112,16 +112,16 @@ public class GameEntity extends Moveable {
 
 		float multiplier = 1;
 
-		if (PhysicsUtilities.onMapX(this, delta, gameHandle.gameMap) &&
-				!PhysicsUtilities.tileCollision(this, delta, 0, gameHandle.gameMap)) {
-			for (GameEntity e : gameHandle.gameEntities){ 
+		if (PhysicsUtilities.onMapX(this, delta, GameMap.MAP) &&
+				!PhysicsUtilities.tileCollision(this, delta, 0, GameMap.MAP)) {
+			for (GameEntity e : ResourceManager.MANAGER.gameEntities){ 
 				if (PhysicsUtilities.entityCollision(this, delta, 0, e)) {
 					if (e.mass >= 0) { 
 						multiplier -= e.mass;
 						multiplier *= e.translateX(delta * multiplier);
 					}
-					if (e.scriptFile != null && this == gameHandle.playerFocusEntity) {
-						gameHandle.onInteract(e);
+					if (e.scriptFile != null && this == ResourceManager.MANAGER.playerFocusEntity) {
+						ScriptManager.MANAGER.onInteract(e);
 						break;
 					}
 				}
@@ -180,8 +180,8 @@ public class GameEntity extends Moveable {
 	 */
 	public void loadFirstTimeAnimation() {
 		try {
-			gameHandle.textureManager.loadCycle(this, this.getAnimationFile());
-			setTexture(gameHandle.textureManager.setFrame(this.id, "idle_south"));
+			TextureManager.MANAGER.loadCycle(this, this.getAnimationFile());
+			setTexture(TextureManager.MANAGER.setFrame(this.id, "idle_south"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -194,7 +194,7 @@ public class GameEntity extends Moveable {
 	 * 'idle_north' animation frame as the appropriate idle animation.
 	 */
 	public void idle() {
-		String last = gameHandle.textureManager.lastAnimation(this.id);
+		String last = TextureManager.MANAGER.lastAnimation(this.id);
 		String idleAnim = "idle_south";
 		
 		if (last.contains("south"))
@@ -206,7 +206,7 @@ public class GameEntity extends Moveable {
 		else if (last.contains("west"))
 			idleAnim = "idle_west";
 		
-		this.setTexture(gameHandle.textureManager.setFrame(this.id, idleAnim));		
+		this.setTexture(TextureManager.MANAGER.setFrame(this.id, idleAnim));		
 	}
 	
 	//------------------ Getters/Setters ------------------//
@@ -229,6 +229,23 @@ public class GameEntity extends Moveable {
 		rotation.set(floatArr[0], floatArr[1], floatArr[2]);
 	}
 	
+	@Override
+	public void setPosition(float x, float y, float z) {
+		if (position == null) position.set(x, y, z);
+		else position.set(x, y, z);
+	}
+	
+	@Override
+	public void setRotation(float x, float y, float z) {
+		if (rotation == null) rotation.set(x, y, z);
+		else rotation.set(x, y, z);
+	}
+	@Override
+	public Vector3f getPosition() { return position; }
+	
+	@Override
+	public Vector3f getRotation() { return rotation; }
+	
 	public void setFile(String f) 	 	{ file = f; }
 	public void setWidth(int w) 		{ width = w; }
 	public void setHeight(int h) 	    { height = h; }
@@ -238,8 +255,6 @@ public class GameEntity extends Moveable {
 
 	public int getWidth()            { return width; }
 	public int getHeight() 			 { return height; }
-	public Vector3f getPosition() 	 { return position; }
-	public Vector3f getRotation() 	 { return rotation; }
 	public String getFile() 		 { return file; }
 	public String getAnimationFile() { return animationFile; }
 

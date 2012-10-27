@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import com.orbit.core.GraphicsManager;
 import com.orbit.core.WindowManager;
 
 public class Window extends Canvas {
@@ -90,10 +91,10 @@ public class Window extends Canvas {
 		int mouseWheelDelta = Mouse.getDWheel();
 		
 		for (String b : buttons.keySet()) {
-			buttons.get(b).checkHover(Mouse.getX(), windowManagerHandle.gameHandle.graphicsManager.getHeight() - Mouse.getY());
+			buttons.get(b).checkHover(Mouse.getX(), GraphicsManager.MANAGER.getHeight() - Mouse.getY());
 		}
 		for (MessageBox mb : messageBoxes) {
-			mb.checkHover(Mouse.getX(), windowManagerHandle.gameHandle.graphicsManager.getHeight() - Mouse.getY());
+			mb.checkHover(Mouse.getX(), GraphicsManager.MANAGER.getHeight() - Mouse.getY());
 		}
 		
 		while (Mouse.next()) {

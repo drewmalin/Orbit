@@ -5,19 +5,31 @@ import java.util.ArrayList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-public class InputManager {
+public enum InputManager {
+	
+	MANAGER;
+	
 	private InputListener mouseListener;
 	private InputListener keyboardListener;
 	private ArrayList<KeyTrigger> keyTriggers;
 	
-	private Game gameHandle;
+	//private Game gameHandle;
 	
+	InputManager() {
+		mouseListener 		= new InputListener();
+		keyboardListener 	= new InputListener();
+		//gameHandle 			= g;
+		keyTriggers			= new ArrayList<KeyTrigger>();
+	}
+	
+	/*
 	public InputManager(Game g) {
 		mouseListener 		= new InputListener();
 		keyboardListener 	= new InputListener();
 		gameHandle 			= g;
 		keyTriggers			= new ArrayList<KeyTrigger>();
 	}
+	*/
 	
 	public void setMouseListener(InputListener il) {
 		mouseListener = il;
@@ -28,8 +40,8 @@ public class InputManager {
 	}
 	
 	public void pollKeyboard() {
-		if (gameHandle.windowManager.windowStack.size() > 0) {
-			gameHandle.windowManager.pollKeyboard();
+		if (WindowManager.MANAGER.windowStack.size() > 0) {
+			WindowManager.MANAGER.pollKeyboard();
 		}
 		else {
 			keyboardListener.onEvent();
@@ -39,7 +51,7 @@ public class InputManager {
 	public void pollMouse() {
 		
 		// Poll GUI, steal context if menu stack size > 0
-		gameHandle.windowManager.pollMouse();
+		WindowManager.MANAGER.pollMouse();
 		
 		// Regular game mouse polling
 		while (Mouse.next()) {

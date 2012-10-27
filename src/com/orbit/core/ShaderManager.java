@@ -14,9 +14,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-public class ShaderManager {
+public enum ShaderManager {
 	
-	private final Game gameHandle;
+	MANAGER;
 	
 	private int shaderProgram;
 	private int vertexShader;
@@ -27,9 +27,7 @@ public class ShaderManager {
 	
 	public FloatBuffer parmData;
 	
-	public ShaderManager(Game g) {
-		gameHandle = g;
-		
+	ShaderManager() {	
 		vertexSource = new StringBuilder();
 		fragmentSource = new StringBuilder();
 		
@@ -42,13 +40,13 @@ public class ShaderManager {
 		GL20.glUniform1(location, parmData);
 		
 		location = GL20.glGetUniformLocation(shaderProgram, "screenHeight");
-		GL20.glUniform1i(location, gameHandle.graphicsManager.getHeight());
+		GL20.glUniform1i(location, GraphicsManager.MANAGER.getHeight());
 		
 		location = GL20.glGetUniformLocation(shaderProgram, "defaultLevel");
-		GL20.glUniform1f(location, gameHandle.gameMap.lightLevel);
+		GL20.glUniform1f(location, GameMap.MAP.lightLevel);
 		
 		int count = 0;
-		for (GameEntity ge : gameHandle.gameEntities)
+		for (GameEntity ge : ResourceManager.MANAGER.gameEntities)
 			if (ge.mapLevel == lvl && ge.lightRadius > 0)
 				count++;
 		

@@ -2,14 +2,16 @@ package com.orbit.core;
 
 import org.lwjgl.util.vector.Vector3f;
 
-public class Camera extends Moveable {
+public enum Camera implements Moveable {
+	
+	CAMERA;
+	
 	public Vector3f target;
+	final Vector3f position = new Vector3f(0, 0, 0);
+	final Vector3f rotation = new Vector3f(0, 0, 0);
 	
-	private final Game gameHandle;
-	
-	public Camera(Game g) {
-		target 	   = new Vector3f(0f, 0f, 0f);
-		gameHandle = g;
+	Camera() {
+		target = new Vector3f(0f, 0f, 0f);
 	}
 
 	public int getPosition(int i) {
@@ -31,36 +33,66 @@ public class Camera extends Moveable {
 	 * at the beginning of the loading of a level). 
 	 */
 	public void findPlayer() {
-		boolean lockNS = gameHandle.playerFocusEntity.cameraLockNS(gameHandle.gameMap, gameHandle.graphicsManager);
-		boolean lockEW = gameHandle.playerFocusEntity.cameraLockEW(gameHandle.gameMap, gameHandle.graphicsManager);
+		boolean lockNS = ResourceManager.MANAGER.playerFocusEntity.cameraLockNS(GameMap.MAP, GraphicsManager.MANAGER);
+		boolean lockEW = ResourceManager.MANAGER.playerFocusEntity.cameraLockEW(GameMap.MAP, GraphicsManager.MANAGER);
 		
-		int mapHeight = gameHandle.gameMap.mapCanvas.get(gameHandle.playerFocusEntity.mapLevel).mapHeight *  gameHandle.gameMap.tileDimensions;
-		int mapWidth = gameHandle.gameMap.mapCanvas.get(gameHandle.playerFocusEntity.mapLevel).mapWidth * gameHandle.gameMap.tileDimensions;
+		int mapHeight = GameMap.MAP.mapCanvas.get(ResourceManager.MANAGER.playerFocusEntity.mapLevel).mapHeight *  GameMap.MAP.tileDimensions;
+		int mapWidth = GameMap.MAP.mapCanvas.get(ResourceManager.MANAGER.playerFocusEntity.mapLevel).mapWidth * GameMap.MAP.tileDimensions;
 
-		int screenHeight = gameHandle.graphicsManager.getHeight();
-		int screenWidth = gameHandle.graphicsManager.getWidth();
+		int screenHeight = GraphicsManager.MANAGER.getHeight();
+		int screenWidth = GraphicsManager.MANAGER.getWidth();
 
-		int top = mapHeight - screenHeight + (gameHandle.graphicsManager.border*2); //excess height
-		int right = mapWidth - screenWidth + (gameHandle.graphicsManager.border*2);
+		int top = mapHeight - screenHeight + (GraphicsManager.MANAGER.border*2); //excess height
+		int right = mapWidth - screenWidth + (GraphicsManager.MANAGER.border*2);
 		
 		setPosition(0, 0, 0);
 		
 		if (lockNS)
-			position.y = gameHandle.playerFocusEntity.position.y;
+			position.y = ResourceManager.MANAGER.playerFocusEntity.position.y;
 		else {
-			if (gameHandle.playerFocusEntity.position.y > ((mapHeight/2) - top/2))
+			if (ResourceManager.MANAGER.playerFocusEntity.position.y > ((mapHeight/2) - top/2))
 				position.y = mapHeight/2 + top/2;
 			else
 				position.y = mapHeight/2 - top/2;
 		}
 		
 		if (lockEW)
-			position.x = gameHandle.playerFocusEntity.position.x;
+			position.x = ResourceManager.MANAGER.playerFocusEntity.position.x;
 		else {
-			if (gameHandle.playerFocusEntity.position.x > ((mapWidth/2) - right/2))
+			if (ResourceManager.MANAGER.playerFocusEntity.position.x > ((mapWidth/2) - right/2))
 				position.x = mapWidth/2 + right/2;
 			else
 				position.x = mapWidth/2 - right/2;
 		}
 	}
+	
+	@Override
+	public void setPosition(float x, float y, float z) {
+		if (position == null) position.set(x, y, z);
+		else position.set(x, y, z);
+	}
+	
+	@Override
+	public void setRotation(float x, float y, float z) {
+		if (rotation == null) rotation.set(x, y, z);
+		else rotation.set(x, y, z);
+	}
+	
+	@Override
+	public float translateX(float delta) {
+		position.x += delta;
+		return delta;
+	}
+	
+	@Override
+	public float translateY(float delta) {
+		position.y += delta;
+		return delta;
+	}
+	
+	@Override
+	public Vector3f getPosition() { return position; }
+	
+	@Override
+	public Vector3f getRotation() { return rotation; }
 }

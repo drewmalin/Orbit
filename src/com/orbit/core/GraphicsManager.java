@@ -14,7 +14,9 @@ import org.lwjgl.opengl.Pbuffer;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
-public class GraphicsManager {
+public enum GraphicsManager {
+	
+	MANAGER;
 
 	private int windowWidth			= 100;
 	private int windowHeight		= 100;
@@ -26,15 +28,12 @@ public class GraphicsManager {
 	private int MSAA				= 0;
 	private String title			= "Lezend";
 	
-	private final Game gameHandle;
 	public final int border = 30;
 	
 	private long lastCheck = 0;
 	private float fadeDuration = 1000;
 	
-	public GraphicsManager(Game g) {
-		gameHandle = g;
-	}
+	GraphicsManager() {}
 	
 	private void setGraphicsMode(String string) {
 		if (string.equals("2D")) {
@@ -47,7 +46,7 @@ public class GraphicsManager {
 			GL11.glEnable(GL11.GL_TEXTURE_2D);	
 			
 			GL11.glLoadIdentity();
-			GL11.glOrtho(0, windowWidth + gameHandle.windowManager.gui.get("storyBox").width, windowHeight, 0, -1, 1);
+			GL11.glOrtho(0, windowWidth + WindowManager.MANAGER.gui.get("storyBox").width, windowHeight, 0, -1, 1);
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
 			GL11.glShadeModel(GL11.GL_SMOOTH);
 		}
@@ -58,12 +57,12 @@ public class GraphicsManager {
 			GL11.glLoadIdentity();
 			
 			GLU.gluPerspective(frust, (float)windowWidth/(float)windowHeight, zNear, zFar);
-			GLU.gluLookAt(gameHandle.camera.position.x, 
-						  gameHandle.camera.position.y, 
-						  gameHandle.camera.position.z, 
-						  gameHandle.camera.target.x, 
-						  gameHandle.camera.target.y, 
-						  gameHandle.camera.target.z,
+			GLU.gluLookAt(Camera.CAMERA.position.x, 
+					Camera.CAMERA.position.y, 
+					Camera.CAMERA.position.z, 
+					Camera.CAMERA.target.x, 
+					Camera.CAMERA.target.y, 
+					Camera.CAMERA.target.z,
 						  0, 1, 0);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			
@@ -86,7 +85,7 @@ public class GraphicsManager {
 
 	public void create(String gmode) {		
 		try {
-			Display.setDisplayMode(new DisplayMode( windowWidth + gameHandle.windowManager.gui.get("storyBox").width, windowHeight ));
+			Display.setDisplayMode(new DisplayMode( windowWidth + WindowManager.MANAGER.gui.get("storyBox").width, windowHeight ));
 			if (fullScreen) {
 				for (DisplayMode dm : Display.getAvailableDisplayModes()) {
 					if (dm.toString().contains(windowWidth + " x " + windowHeight + " x " + 32)) {
@@ -135,16 +134,16 @@ public class GraphicsManager {
 		GL11.glLoadIdentity();
 		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		GL11.glTranslatef(windowWidth/2, windowHeight/2, 0);
-		GL11.glTranslatef(-gameHandle.camera.position.x, 
-						  -gameHandle.camera.position.y, 
-						  -gameHandle.camera.position.z);
+		GL11.glTranslatef(-Camera.CAMERA.position.x, 
+						  -Camera.CAMERA.position.y, 
+						  -Camera.CAMERA.position.z);
 		
-		if (gameHandle.playerFocusEntity.mapLevel > 0)
+		if (ResourceManager.MANAGER.playerFocusEntity.mapLevel > 0)
 			drawBackground();
 		
 		drawCurrentLevel();
 		
-		if (gameHandle.playerFocusEntity.mapLevel + 1 < gameHandle.gameMap.mapCanvas.size())
+		if (ResourceManager.MANAGER.playerFocusEntity.mapLevel + 1 < GameMap.MAP.mapCanvas.size())
 			drawForeground();
 
 		GL11.glPopMatrix();
@@ -155,26 +154,26 @@ public class GraphicsManager {
 	 * currently sits at). All entities also at this level will be drawn.
 	 */
 	public void drawCurrentLevel() {
-		int playerLevel = gameHandle.playerFocusEntity.mapLevel;
-		gameHandle.shaderManager.bind();
+		int playerLevel = ResourceManager.MANAGER.playerFocusEntity.mapLevel;
+		ShaderManager.MANAGER.bind();
 		
-		for (GameEntity ge : gameHandle.gameEntities) {
+		for (GameEntity ge : ResourceManager.MANAGER.gameEntities) {
 			if (ge.mapLevel == playerLevel && ge.lightRadius > 0) {
-				gameHandle.shaderManager.parmData.put((windowWidth/2) + ge.position.x - gameHandle.camera.position.x + ge.width/2);
-				gameHandle.shaderManager.parmData.put((windowHeight/2) + ge.position.y - gameHandle.camera.position.y + ge.height/2);
-				gameHandle.shaderManager.parmData.put(ge.position.z);
-				gameHandle.shaderManager.parmData.put(ge.lightRadius);
+				ShaderManager.MANAGER.parmData.put((windowWidth/2) + ge.position.x - Camera.CAMERA.position.x + ge.width/2);
+				ShaderManager.MANAGER.parmData.put((windowHeight/2) + ge.position.y - Camera.CAMERA.position.y + ge.height/2);
+				ShaderManager.MANAGER.parmData.put(ge.position.z);
+				ShaderManager.MANAGER.parmData.put(ge.lightRadius);
 			}
 		}
 
-		gameHandle.shaderManager.persistParmData(playerLevel);
+		ShaderManager.MANAGER.persistParmData(playerLevel);
 				
-		gameHandle.gameMap.drawLevel(playerLevel);
+		GameMap.MAP.drawLevel(playerLevel);
 		
-		gameHandle.shaderManager.parmData.clear();
-		gameHandle.shaderManager.unbind();
+		ShaderManager.MANAGER.parmData.clear();
+		ShaderManager.MANAGER.unbind();
 		
-		for (GameEntity ge : gameHandle.gameEntities) {
+		for (GameEntity ge : ResourceManager.MANAGER.gameEntities) {
 			if (ge.mapLevel == playerLevel) ge.draw();
 		}
 		
@@ -187,19 +186,19 @@ public class GraphicsManager {
 	 */
 	public void drawForeground() {
 
-		for (int i = gameHandle.playerFocusEntity.mapLevel + 1; i < gameHandle.gameMap.mapCanvas.size(); i++) {
+		for (int i = ResourceManager.MANAGER.playerFocusEntity.mapLevel + 1; i < GameMap.MAP.mapCanvas.size(); i++) {
 			GL11.glPushMatrix();
-			GL11.glTranslatef(-gameHandle.camera.position.x * i * .1f, 
-					  	 	  -gameHandle.camera.position.y * i * .1f, 
-					  	 	  -gameHandle.camera.position.z * i * .1f);
+			GL11.glTranslatef(-Camera.CAMERA.position.x * i * .1f, 
+					  	 	  -Camera.CAMERA.position.y * i * .1f, 
+					  	 	  -Camera.CAMERA.position.z * i * .1f);
 			
-			gameHandle.shaderManager.bind();
-			gameHandle.shaderManager.persistParmData(i);
-			gameHandle.gameMap.drawLevel(i);
-			gameHandle.shaderManager.parmData.clear();
-			gameHandle.shaderManager.unbind();
+			ShaderManager.MANAGER.bind();
+			ShaderManager.MANAGER.persistParmData(i);
+			GameMap.MAP.drawLevel(i);
+			ShaderManager.MANAGER.parmData.clear();
+			ShaderManager.MANAGER.unbind();
 			
-			for (GameEntity ge : gameHandle.gameEntities) {
+			for (GameEntity ge : ResourceManager.MANAGER.gameEntities) {
 				if (ge.mapLevel == i) ge.draw();
 			}
 			
@@ -213,21 +212,21 @@ public class GraphicsManager {
 	 * distance from the playerFocusEntity's level. All entities also at this level will be drawn.
 	 */
 	public void drawBackground() {
-		int playerLevel = gameHandle.playerFocusEntity.mapLevel;
+		int playerLevel = ResourceManager.MANAGER.playerFocusEntity.mapLevel;
 
 		for (int i = 0; i < playerLevel; i++) {
 			GL11.glPushMatrix();
-			GL11.glTranslatef(gameHandle.camera.position.x * (playerLevel - i) * .1f, 
-					  	 	  gameHandle.camera.position.y * (playerLevel - i) * .1f, 
-					  	 	  gameHandle.camera.position.z * (playerLevel - i) * .1f);
+			GL11.glTranslatef(Camera.CAMERA.position.x * (playerLevel - i) * .1f, 
+					Camera.CAMERA.position.y * (playerLevel - i) * .1f, 
+					Camera.CAMERA.position.z * (playerLevel - i) * .1f);
 			
-			gameHandle.shaderManager.bind();
-			gameHandle.shaderManager.persistParmData(i);
-			gameHandle.gameMap.drawLevel(i);
-			gameHandle.shaderManager.parmData.clear();
-			gameHandle.shaderManager.unbind();
+			ShaderManager.MANAGER.bind();
+			ShaderManager.MANAGER.persistParmData(i);
+			GameMap.MAP.drawLevel(i);
+			ShaderManager.MANAGER.parmData.clear();
+			ShaderManager.MANAGER.unbind();
 			
-			for (GameEntity ge : gameHandle.gameEntities) {
+			for (GameEntity ge : ResourceManager.MANAGER.gameEntities) {
 				if (ge.mapLevel == i) ge.draw();
 			}
 			
@@ -246,9 +245,9 @@ public class GraphicsManager {
 			
 			GL11.glBegin(GL11.GL_QUADS);
 				GL11.glVertex2f(0, 0);
-				GL11.glVertex2f(gameHandle.graphicsManager.getWidth(), 0);
-				GL11.glVertex2f(gameHandle.graphicsManager.getWidth(), gameHandle.graphicsManager.getHeight());
-				GL11.glVertex2f(0, gameHandle.graphicsManager.getHeight());
+				GL11.glVertex2f(GraphicsManager.MANAGER.getWidth(), 0);
+				GL11.glVertex2f(GraphicsManager.MANAGER.getWidth(), GraphicsManager.MANAGER.getHeight());
+				GL11.glVertex2f(0, GraphicsManager.MANAGER.getHeight());
 			GL11.glEnd();
 			
 			Display.update();
@@ -267,9 +266,9 @@ public class GraphicsManager {
 			
 			GL11.glBegin(GL11.GL_QUADS);
 				GL11.glVertex2f(0, 0);
-				GL11.glVertex2f(gameHandle.graphicsManager.getWidth(), 0);
-				GL11.glVertex2f(gameHandle.graphicsManager.getWidth(), gameHandle.graphicsManager.getHeight());
-				GL11.glVertex2f(0, gameHandle.graphicsManager.getHeight());
+				GL11.glVertex2f(GraphicsManager.MANAGER.getWidth(), 0);
+				GL11.glVertex2f(GraphicsManager.MANAGER.getWidth(), GraphicsManager.MANAGER.getHeight());
+				GL11.glVertex2f(0, GraphicsManager.MANAGER.getHeight());
 			GL11.glEnd();
 			
 			Display.update();

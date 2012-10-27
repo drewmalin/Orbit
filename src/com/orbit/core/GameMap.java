@@ -6,8 +6,10 @@ import java.util.HashMap;
 
 import org.lwjgl.opengl.GL11;
 
-public class GameMap {
+public enum GameMap {
 
+	MAP;
+	
 	public int tileDimensions;
 	public float lightLevel;
 	
@@ -22,7 +24,7 @@ public class GameMap {
 	 * that make up the map. Each tile contains texture, position, and
 	 * collision information.
 	 */
-	public GameMap() {
+	GameMap() {
 		mapCanvas = new ArrayList<MapCanvas>();
 		tiles = new HashMap<Integer, MapTile>();
 		

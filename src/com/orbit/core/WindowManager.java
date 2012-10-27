@@ -14,21 +14,28 @@ import com.orbit.ui.Window;
 import com.orbit.xml.Node;
 import com.orbit.xml.XMLParser;
 
-public final class WindowManager {
+public enum WindowManager {
 	
-	public final Game gameHandle;
+	//public final Game gameHandle;
+	MANAGER;
 	
 	public final HashMap<String, Window> gui;
 	public final HashMap<String, Window> windows;
 	public ArrayList<Window> windowStack;
 	
+	WindowManager() {
+		gui 		= new HashMap<String, Window>();
+		windows 	= new HashMap<String, Window>();
+		windowStack	= new ArrayList<Window>();
+	}
+	/*
 	public WindowManager(Game gh) {
 		gameHandle 	= gh;
 		gui 		= new HashMap<String, Window>();
 		windows 	= new HashMap<String, Window>();
 		windowStack	= new ArrayList<Window>();
 	}
-
+*/
 	public Window createWindow(String name, int x, int y) {
 		Window w = new Window(this, null);
 		w.name = name;
@@ -81,13 +88,13 @@ public final class WindowManager {
 					window.y = infoEl.readInt();
 				else if (infoEl.name.equals("width")) {
 					if (infoEl.readString().equals("FULL"))
-						window.width = gameHandle.graphicsManager.getWidth();
+						window.width = GraphicsManager.MANAGER.getWidth();
 					else
 						window.width = infoEl.readInt();
 				}
 				else if (infoEl.name.equals("height")) {
 					if (infoEl.readString().equals("FULL"))
-						window.height = gameHandle.graphicsManager.getHeight();
+						window.height = GraphicsManager.MANAGER.getHeight();
 					else
 						window.height = infoEl.readInt();
 				}

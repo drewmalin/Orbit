@@ -2,6 +2,8 @@ package com.orbit.core;
 
 public class PhysicsUtilities {
 	
+	private PhysicsUtilities() {}
+	
 	/**
 	 * Determines whether or not the GameEntity (ge) will be pushed off of the
 	 * GameMap (gm) if the y-translation value (delta) is applied to it.

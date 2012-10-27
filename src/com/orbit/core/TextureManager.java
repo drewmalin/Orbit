@@ -9,17 +9,18 @@ import org.newdawn.slick.util.ResourceLoader;
 import com.orbit.xml.Node;
 import com.orbit.xml.XMLParser;
 
-public class TextureManager {
+public enum TextureManager {
 
-	private Game gameHandle;
+	MANAGER;
+	
+	//private Game gameHandle;
 	private HashMap<Integer, TextureCycle> textureStore;
 
 	/* Constructor:
 	 * Creates a 'texture store' to persist each unique texture in an animation.
 	 * Establishes a handle back to the main game object.
 	 */
-	public TextureManager(Game game) {
-		gameHandle = game;
+	TextureManager() {
 		textureStore = new HashMap<Integer, TextureCycle>();
 	}
 

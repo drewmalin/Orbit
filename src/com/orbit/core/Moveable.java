@@ -2,41 +2,26 @@ package com.orbit.core;
 
 import org.lwjgl.util.vector.Vector3f;
 
-public class Moveable {
-	Vector3f position;
-	Vector3f rotation;
-	
-	public void setPosition(float x, float y, float z) {
-		if (position == null) position = new Vector3f(x, y, z);
-		else position.set(x, y, z);
-	}
-	
-	public void setRotation(float x, float y, float z) {
-		if (rotation == null) rotation = new Vector3f(x, y, z);
-		else rotation.set(x, y, z);
-	}
+public interface Moveable {
+
+	public void setPosition(float x, float y, float z);
+	public void setRotation(float x, float y, float z);
 	
 	/**
 	 * translateX
 	 * @param delta
 	 * @return Returns the amount translated.
 	 */
-	public float translateX(float delta) {
-		position.x += delta;
-		return delta;
-	}
+	public float translateX(float delta);
 	
 	/**
 	 * translateY
 	 * @param delta
 	 * @return Returns the amount translated.
 	 */
-	public float translateY(float delta) {
-		position.y += delta;
-		return delta;
-	}
+	public float translateY(float delta);
 	
-	public Vector3f getPosition() { return position; }
-	public Vector3f getRotation() { return rotation; }
+	public Vector3f getPosition();
+	public Vector3f getRotation();
 
 }

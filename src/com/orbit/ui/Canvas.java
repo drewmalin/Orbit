@@ -5,6 +5,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.orbit.core.ClickListener;
+import com.orbit.core.GraphicsManager;
 import com.orbit.core.WindowManager;
 
 
@@ -150,7 +151,7 @@ public class Canvas {
 		drawBackground();
 		if (hovering && hoverMessageBox!= null && !hoverMessageBox.message.isEmpty()) {
 			hoverMessageBox.x = Mouse.getX() + 20;
-			hoverMessageBox.y = windowManagerHandle.gameHandle.graphicsManager.getHeight() - Mouse.getY() + 20;
+			hoverMessageBox.y = GraphicsManager.MANAGER.getHeight() - Mouse.getY() + 20;
 			hoverMessageBox.draw();
 		}
 	}
