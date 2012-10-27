@@ -42,7 +42,7 @@ public enum Camera implements Moveable {
 		int screenHeight = GraphicsManager.MANAGER.getHeight();
 		int screenWidth = GraphicsManager.MANAGER.getWidth();
 
-		int top = mapHeight - screenHeight + (GraphicsManager.MANAGER.border*2); //excess height
+		int top = mapHeight - screenHeight + (GraphicsManager.MANAGER.border*2); //excess height!
 		int right = mapWidth - screenWidth + (GraphicsManager.MANAGER.border*2);
 		
 		setPosition(0, 0, 0);
