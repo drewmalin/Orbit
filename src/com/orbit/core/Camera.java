@@ -25,4 +25,42 @@ public class Camera extends Moveable {
 	}
 	
 	public void setTarget(Vector3f vector3f)   { target.set(vector3f); }
+
+	/*
+	 * A super messy way to initiate the camera position without gameplay-input (meant to be run exactly once,
+	 * at the beginning of the loading of a level). 
+	 */
+	public void findPlayer() {
+		boolean lockNS = gameHandle.playerFocusEntity.cameraLockNS(gameHandle.gameMap, gameHandle.graphicsManager);
+		boolean lockEW = gameHandle.playerFocusEntity.cameraLockEW(gameHandle.gameMap, gameHandle.graphicsManager);
+		
+		int mapHeight = gameHandle.gameMap.mapCanvas.get(gameHandle.playerFocusEntity.mapLevel).mapHeight *  gameHandle.gameMap.tileDimensions;
+		int mapWidth = gameHandle.gameMap.mapCanvas.get(gameHandle.playerFocusEntity.mapLevel).mapWidth * gameHandle.gameMap.tileDimensions;
+
+		int screenHeight = gameHandle.graphicsManager.getHeight();
+		int screenWidth = gameHandle.graphicsManager.getWidth();
+
+		int top = mapHeight - screenHeight + (gameHandle.graphicsManager.border*2); //excess height
+		int right = mapWidth - screenWidth + (gameHandle.graphicsManager.border*2);
+		
+		setPosition(0, 0, 0);
+		
+		if (lockNS)
+			position.y = gameHandle.playerFocusEntity.position.y;
+		else {
+			if (gameHandle.playerFocusEntity.position.y > ((mapHeight/2) - top/2))
+				position.y = mapHeight/2 + top/2;
+			else
+				position.y = mapHeight/2 - top/2;
+		}
+		
+		if (lockEW)
+			position.x = gameHandle.playerFocusEntity.position.x;
+		else {
+			if (gameHandle.playerFocusEntity.position.x > ((mapWidth/2) - right/2))
+				position.x = mapWidth/2 + right/2;
+			else
+				position.x = mapWidth/2 - right/2;
+		}
+	}
 }

@@ -45,6 +45,8 @@ public class PhysicsUtilities {
 	 */
 	static boolean tileCollision(GameEntity ge, float deltaX, float deltaY, GameMap gm) {
 		
+		boolean ret = false;
+		
 		int topLeftX = (int) ((ge.position.x  + deltaX) / gm.tileDimensions);
 		int topLeftY = (int) ((ge.position.y  + deltaY) / gm.tileDimensions);
 		
@@ -59,27 +61,43 @@ public class PhysicsUtilities {
 		
 		for (int i = 0; i < gm.mapCanvas.get(ge.mapLevel).mapData[topLeftY][topLeftX].length; i++) {
 			if (gm.tiles.get(gm.mapCanvas.get(ge.mapLevel).mapData[topLeftY][topLeftX][i]).collidable)
-				return true;
+				ret = true;
 		}
 		
 		for (int i = 0; i < gm.mapCanvas.get(ge.mapLevel).mapData[topRightY][topRightX].length; i++) {
 			if (gm.tiles.get(gm.mapCanvas.get(ge.mapLevel).mapData[topRightY][topRightX][i]).collidable)
-				return true;
+				ret = true;
 		}
 		
 		for (int i = 0; i < gm.mapCanvas.get(ge.mapLevel).mapData[botLeftY][botLeftX].length; i++) {
 			if (gm.tiles.get(gm.mapCanvas.get(ge.mapLevel).mapData[botLeftY][botLeftX][i]).collidable)
-				return true;
+				ret = true;
 		}
 		
 		for (int i = 0; i < gm.mapCanvas.get(ge.mapLevel).mapData[botRightY][botRightX].length; i++) {
 			if (gm.tiles.get(gm.mapCanvas.get(ge.mapLevel).mapData[botRightY][botRightX][i]).collidable)
-				return true;
+				ret = true;
 		}
 		
-		return false;
+		if (ret) ge.lastMovement.x = ge.lastMovement.y = 0;
+		
+		return ret;
 	}
 	
+	static boolean tileTest(GameEntity ge, int tileID, GameMap gm) {
+		
+		boolean ret = false;
+		
+		int x = (int) (ge.position.x + ge.width/2) / gm.tileDimensions;
+		int y = (int) (ge.position.y + ge.height) / gm.tileDimensions;
+		
+		for (int i = 0; i < gm.mapCanvas.get(ge.mapLevel).mapData[y][x].length; i++) {
+			if (gm.tiles.get(gm.mapCanvas.get(ge.mapLevel).mapData[y][x][i]).id == tileID)
+				ret = true;
+		}
+		
+		return ret;
+	}
 	/**
 	 * Determines whether or not the translation values (deltaX and deltaY) will push the
 	 * current GameEntity (ge1) into the target GameEntity (ge2).
@@ -90,6 +108,8 @@ public class PhysicsUtilities {
 	 * @return True if the delta values cause ge1 to overlap ge2, False otherwise
 	 */
 	static boolean entityCollision(GameEntity e1, float deltaX, float deltaY, GameEntity e2) {
+		
+		boolean ret = false;
 		
 		if (e1.id == e2.id) return false;
 		
@@ -104,9 +124,10 @@ public class PhysicsUtilities {
 				if ((e1MinX + deltaX >= e2MinX && e1MinX + deltaX <= e2MaxX) ||
 					(e1MaxX + deltaX >= e2MinX && e1MaxX + deltaX <= e2MaxX)) {
 					//Collision!
-					return true;
+					ret = true;
 				}
 		}
-		return false;
+
+		return ret;
 	}
 }

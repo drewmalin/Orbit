@@ -24,14 +24,18 @@ public class GameMap {
 	 */
 	public GameMap() {
 		mapCanvas = new ArrayList<MapCanvas>();
-		
 		tiles = new HashMap<Integer, MapTile>();
 		
+		// Special case tile: invisible tile
 		MapTile invisibleTile = new MapTile();
 		invisibleTile.id = -1;
 		invisibleTile.collidable = true;
-		
 		tiles.put(-1, invisibleTile);
+		
+		// Special case tile: slippery tile
+		MapTile slipperyTile = new MapTile();
+		slipperyTile.id = -2;
+		tiles.put(-2, slipperyTile);
 		
 		lightLevel = 1;
 	}
@@ -61,9 +65,18 @@ public class GameMap {
 				String[] components = tile.split(",");
 				int tileStack[] = new int[components.length];
 				
-				// For each tile component...
+				// For each tile component... ('-' is a special character
+				// that will not be drawn and will be marked as 'collidable',
+				// '*' is a special character that will not be drawn and will
+				// have the effect of making that tile 'slippery').
 				for (String component : components) {
-					tileStack[stackIdx++] = component.equals("-") ? -1 : Integer.parseInt(component);
+					if (component.equals("-"))
+						tileStack[stackIdx++] = -1;
+					else if (component.equals("*"))
+						tileStack[stackIdx++] = -2;
+					else {
+						tileStack[stackIdx++] = Integer.parseInt(component);
+					}
 				}				
 				tileData[tileIdx++] = tileStack;
 			}
@@ -101,6 +114,7 @@ public class GameMap {
 	 * to the screen. 
 	 */
 	public void drawLevel(int level) {
+		
 		for (int row = 0; row < mapCanvas.get(level).mapData.length; row++) {
 			for (int col = 0; col < mapCanvas.get(level).mapData[row].length; col++) {
 				//Do not bother drawing invisible tiles

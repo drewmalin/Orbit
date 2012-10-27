@@ -29,6 +29,9 @@ public class GraphicsManager {
 	private final Game gameHandle;
 	public final int border = 30;
 	
+	private long lastCheck = 0;
+	private float fadeDuration = 1000;
+	
 	public GraphicsManager(Game g) {
 		gameHandle = g;
 	}
@@ -153,11 +156,10 @@ public class GraphicsManager {
 	 */
 	public void drawCurrentLevel() {
 		int playerLevel = gameHandle.playerFocusEntity.mapLevel;
-		int c = 0;
 		gameHandle.shaderManager.bind();
 		
 		for (GameEntity ge : gameHandle.gameEntities) {
-			if (ge.mapLevel == playerLevel) {
+			if (ge.mapLevel == playerLevel && ge.lightRadius > 0) {
 				gameHandle.shaderManager.parmData.put((windowWidth/2) + ge.position.x - gameHandle.camera.position.x + ge.width/2);
 				gameHandle.shaderManager.parmData.put((windowHeight/2) + ge.position.y - gameHandle.camera.position.y + ge.height/2);
 				gameHandle.shaderManager.parmData.put(ge.position.z);
@@ -233,6 +235,48 @@ public class GraphicsManager {
 		}
 	}
 	
+	public void fadeToBlack() {
+		long currentTime = System.currentTimeMillis();
+		
+		do {
+
+			lastCheck = System.currentTimeMillis();
+
+			GL11.glColor4f(0f, 0f, 0f, (float)((lastCheck - currentTime) / fadeDuration));
+			
+			GL11.glBegin(GL11.GL_QUADS);
+				GL11.glVertex2f(0, 0);
+				GL11.glVertex2f(gameHandle.graphicsManager.getWidth(), 0);
+				GL11.glVertex2f(gameHandle.graphicsManager.getWidth(), gameHandle.graphicsManager.getHeight());
+				GL11.glVertex2f(0, gameHandle.graphicsManager.getHeight());
+			GL11.glEnd();
+			
+			Display.update();
+			Display.sync(60);
+			
+		} while (lastCheck - currentTime < fadeDuration);
+	}
+	
+	public void fadeIn() {
+		long currentTime = System.currentTimeMillis();
+		
+		do	{
+			lastCheck = System.currentTimeMillis();
+
+			GL11.glColor4f(0f, 0f, 0f, 1 - (float)((lastCheck - currentTime) / fadeDuration));
+			
+			GL11.glBegin(GL11.GL_QUADS);
+				GL11.glVertex2f(0, 0);
+				GL11.glVertex2f(gameHandle.graphicsManager.getWidth(), 0);
+				GL11.glVertex2f(gameHandle.graphicsManager.getWidth(), gameHandle.graphicsManager.getHeight());
+				GL11.glVertex2f(0, gameHandle.graphicsManager.getHeight());
+			GL11.glEnd();
+			
+			Display.update();
+			Display.sync(60);
+			
+		} while (lastCheck - currentTime < fadeDuration);
+	}
 	//------------------ Getters/Setters ------------------//
 	
 	public void setFullscreen(boolean b) { fullScreen = b; }

@@ -1,8 +1,9 @@
-package com.orbit.core;
+package com.orbit.xml;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+
 
 public class XMLWriter {
 	

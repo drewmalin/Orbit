@@ -1,5 +1,8 @@
 package com.orbit.core;
 
+import com.orbit.xml.Node;
+import com.orbit.xml.XMLParser;
+
 
 public class ResourceManager {
 	
@@ -94,6 +97,12 @@ public class ResourceManager {
 							entity.setPosition(entityEl.readFloatArray());
 					}
 					gameHandle.addEntity(entity);
+				}
+				else if (el.name.equals("player")) {
+					for (Node playerNode : el.children) {
+						if (playerNode.name.equals("position"))
+							gameHandle.playerFocusEntity.setPosition(playerNode.readFloatArray());
+					}
 				}
 			}
 		}

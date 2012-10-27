@@ -6,6 +6,9 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import com.orbit.xml.Node;
+import com.orbit.xml.XMLParser;
+
 public class TextureManager {
 
 	private Game gameHandle;

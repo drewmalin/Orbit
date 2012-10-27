@@ -1,6 +1,7 @@
 package com.orbit.core;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 
@@ -19,10 +20,14 @@ public class GameEntity extends Moveable {
 	public String animationFile;
 	public float lightRadius;
 	
+	public Vector2f lastMovement;
+	
 	public GameEntity(Game g) {
 		gameHandle = g;
 		position = new Vector3f(0, 0, 0);
 		rotation = new Vector3f(0, 0, 0);
+		lastMovement = new Vector2f(0, 0);
+		
 		width = height = 0;
 		lightRadius = 0;
 		animationFile = null;
@@ -85,6 +90,9 @@ public class GameEntity extends Moveable {
 				}
 			}
 			position.y += delta * multiplier;
+			lastMovement.y = (delta * multiplier > 0 ? 1 : delta * multiplier < 0 ? -1 : 0);
+			lastMovement.x = 0;
+			
 			return multiplier;
 		}
 		
@@ -119,7 +127,9 @@ public class GameEntity extends Moveable {
 				}
 			}
 			position.x += delta * multiplier;
-
+			lastMovement.x = (delta * multiplier > 0 ? 1 : delta * multiplier < 0 ? -1 : 0);
+			lastMovement.y = 0;
+			
 			return multiplier;
 		}
 		
@@ -137,7 +147,7 @@ public class GameEntity extends Moveable {
 		int mapHeight = map.mapCanvas.get(mapLevel).mapHeight * map.tileDimensions;
 		int screenHeight = graphicsManager.getHeight();
 		int top = mapHeight - screenHeight + (graphicsManager.border*2); //excess height
-
+		
 		if (position.y > ((mapHeight/2) - top/2) &&
 				position.y < ((mapHeight/2) + top/2)) {
 			lock = true;

@@ -3,6 +3,9 @@ package com.orbit.core;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
+import com.orbit.ui.MessageBox;
+import com.orbit.ui.Window;
+
 public class OrbitGame extends Game {
 		
 	boolean temp = false;
@@ -28,8 +31,11 @@ public class OrbitGame extends Game {
 		
 		
 		// Create constant GUI
-		windowManager.createWindow("storyBox", 800, 0).setWidth(350).setHeight(600);
-		MessageBox mb = new MessageBox(windowManager, null);
+		
+		Window w = windowManager.createWindow("storyBox", 800, 0).setWidth(350).setHeight(600);
+		w.setColor(new float[] {0, 0, 0, 1});
+		MessageBox mb = new MessageBox(windowManager, w);
+
 		mb.message = "Mr. and Mrs. Dursley, of number four, Privet Drive, were proud to say that they were perfectly normal, thank you very much. They were the last people you'd expect to be involved in anything strange or mysterious, because they just didn't hold with such nonsense.\n\nMr. Dursley was the director of a firm called Grunnings, which made drills. He was a big, beefy man with hardly any neck, although he did have a very large mustache. Mrs. Dursley was thin and blonde and had nearly twice the usual amount of neck, which came in very useful as she spent so much of her time craning over garden fences, spying on the neighbors. The Dursleys had a small son called Dudley and in their opinion there was no finer boy anywhere.";
 		mb.height = 600;
 		mb.width = 350;
@@ -38,6 +44,7 @@ public class OrbitGame extends Game {
 		mb.fontName = "Times New Roman";
 		mb.fontSize = 16;
 		mb.setFontColor("white");
+		mb.setColor(new float[] {0, 0, 0, 1});
 		
 		// Load GraphicsManager
 		graphicsManager.setResolution(800, 600);
@@ -46,7 +53,7 @@ public class OrbitGame extends Game {
 		windowManager.gui.get("storyBox").messageBoxes.add(mb);
 		mb.load();
 		mb.fixMessage();
-
+		
 		// Load game menus
 		windowManager.loadMenu("res/menu/pause.xml");
 		windowManager.createClickListeners();
@@ -69,17 +76,13 @@ public class OrbitGame extends Game {
 		// Load first map
 		GameMap map = resourceManager.loadMap("res/maps/Level1.xml");
 		setLevel(map);
-		
-		int startX = (gameMap.mapCanvas.get(playerFocusEntity.mapLevel).mapWidth * gameMap.tileDimensions)/2;
-		int startY = (gameMap.mapCanvas.get(playerFocusEntity.mapLevel).mapHeight * gameMap.tileDimensions)/2;
-
-		playerFocusEntity.setPosition(new float[]{startX, startY, 0});
-		camera.setPosition(startX, startY, 0);
+		camera.findPlayer();
 	}
 	
 	private InputListener keyboardListener = new InputListener() {
 		public void onEvent() {
-			
+						
+			float mult = 1;
 			float playerDeltaX = 0, camDeltaX = 0;
 			float playerDeltaY = 0, camDeltaY = 0;
 			boolean lockNS = playerFocusEntity.cameraLockNS(gameMap, graphicsManager);
@@ -89,22 +92,26 @@ public class OrbitGame extends Game {
 				if (Keyboard.getEventKeyState()) {
 					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE)
 						windowManager.pushMenuStack("pause");
-					else if (Keyboard.getEventKey() == Keyboard.KEY_0)
-						playerFocusEntity.mapLevel = 0;
-					else if (Keyboard.getEventKey() == Keyboard.KEY_1)
-						playerFocusEntity.mapLevel = 1;
-					else if (Keyboard.getEventKey() == Keyboard.KEY_2)
-						windowManager.gui.get("storyBox").messageBoxes.get(0).addMessage("\nThe Dursleys had everything they wanted, but they also had a secret, and their greatest fear was that somebody would discover it. They didn't think they could bear it if anyone found out about the Potters.");
-					else if (Keyboard.getEventKey() == Keyboard.KEY_3)
-						windowManager.gui.get("storyBox").messageBoxes.get(0).addMessage("\nMrs. Potter was Mrs. Dursley's sister, but they hadn't met for several years; in fact, Mrs. Dursley pretended she didn't have a sister, because her sister and her good-for-nothing husband were as unDursleyish as it was possible to be.");
-					else if (Keyboard.getEventKey() == Keyboard.KEY_4)
-						windowManager.gui.get("storyBox").messageBoxes.get(0).addMessage("\nThe Dursleys shuddered to think what the neighbors would say if the Potters arrived in the street. The Dursleys knew that the Potters had a small son, too, but they had never even seen him. This boy was another good reason for keeping the Potters away; they didn't want Dudley mixing with a child like that.");
-					else if (Keyboard.getEventKey() == Keyboard.KEY_UP)
-						windowManager.gui.get("storyBox").messageBoxes.get(0).moveDown();
-					else if (Keyboard.getEventKey() == Keyboard.KEY_DOWN)
-						windowManager.gui.get("storyBox").messageBoxes.get(0).moveUp();
 				}
+			}
+			
+			if (PhysicsUtilities.tileTest(playerFocusEntity, -2, gameMap)) {
+				//System.out.println(playerFocusEntity.lastMovement);
+				if (playerFocusEntity.lastMovement.x != 0) {
+					playerDeltaX = 2 * playerFocusEntity.lastMovement.x;
+					if (lockEW) camDeltaX = playerDeltaX;
+					mult = playerFocusEntity.translateX(playerDeltaX);
+					camera.translateX(camDeltaX * mult);
+					return;
+				}
+				else if (playerFocusEntity.lastMovement.y != 0) {
 				
+					playerDeltaY = 2 * playerFocusEntity.lastMovement.y;
+					if (lockNS) camDeltaY = playerDeltaY;
+					mult = playerFocusEntity.translateY(playerDeltaY);
+					camera.translateY(camDeltaY * mult);
+					return;
+				}
 			}
 			
 			if (Keyboard.isKeyDown(Keyboard.KEY_W) && Keyboard.isKeyDown(Keyboard.KEY_A)) {
@@ -155,7 +162,6 @@ public class OrbitGame extends Game {
 				playerFocusEntity.idle();
 			}
 			
-			float mult = 1;
 			if (playerDeltaX != 0) mult = playerFocusEntity.translateX(playerDeltaX);
 			if (playerDeltaY != 0) mult = playerFocusEntity.translateY(playerDeltaY);
 			if (camDeltaX != 0) camera.translateX(camDeltaX * mult);

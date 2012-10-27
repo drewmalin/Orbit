@@ -1,11 +1,10 @@
-package com.orbit.core;
+package com.orbit.xml;
 
 
 import java.util.ArrayList;
 
 public class Node  {
 	private int dimLimit = 16;
-	
 	public ArrayList<Node> children;
 	public String name;
 	public String data;

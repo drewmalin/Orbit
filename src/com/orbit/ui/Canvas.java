@@ -1,8 +1,11 @@
-package com.orbit.core;
+package com.orbit.ui;
 
 import java.util.ArrayList;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import com.orbit.core.ClickListener;
+import com.orbit.core.WindowManager;
 
 
 public class Canvas {
@@ -19,7 +22,7 @@ public class Canvas {
 	public 	ArrayList<MessageBox> 	messageBoxes;
 	public	boolean					active;
 	public 	String 					backgroundImageFile;
-	MessageBox hoverMessageBox;
+	public MessageBox hoverMessageBox;
 	public boolean hovering = false;
 	public boolean hoverColorRequested = false;
 	public boolean animated = false;
@@ -102,6 +105,7 @@ public class Canvas {
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 		}
 		else {
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glPushMatrix();
 			GL11.glLoadIdentity();
 			GL11.glColor4f(color[0], color[1], color[2], color[3]);
@@ -113,6 +117,7 @@ public class Canvas {
 				GL11.glVertex2f(width, 0);
 			GL11.glEnd();
 			GL11.glPopMatrix();
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 		}
 	}
 	

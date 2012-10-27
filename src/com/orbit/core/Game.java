@@ -26,6 +26,7 @@ public class Game {
 	public GameMap gameMap;
 	
 	public boolean multiplayer;
+	
 	public final float diagonal = .70710678f;
 
 	public Game() {
@@ -128,28 +129,49 @@ public class Game {
 	// when playerfocus entity interacts with this entity
 	public void onInteract(GameEntity ge) {
 		
+		Object queryScript;
+		
 		if (ge.scriptFile != "") {
+
 			scriptManager.run(ge.scriptFile);
 			if (scriptManager.entityScript.onInteract() != null) {
-				String lvl = scriptManager.entityScript.onInteract().get("level").toString();
 				
-				if (lvl != null) changeLevel(lvl);
+				queryScript = scriptManager.entityScript.onInteract().get("level");
+				if (queryScript != null) {
+					changeLevel(queryScript.toString());
+				}
+				
+				queryScript = scriptManager.entityScript.onInteract().get("newMessage");
+				if (queryScript != null) {
+					windowManager.gui.get("storyBox").messageBoxes.get(0).replaceMessage(queryScript.toString());
+				}
+				
+				queryScript = scriptManager.entityScript.onInteract().get("appendMessage");
+				if (queryScript != null) {
+					windowManager.gui.get("storyBox").messageBoxes.get(0).addMessage(queryScript.toString());
+				}
+				
+				queryScript = scriptManager.entityScript.onInteract().get("destroy");
+				if (queryScript != null) {
+					if (queryScript.toString().toLowerCase().equals("true"))
+						gameEntities.remove(ge);
+				}
 			}
 		}
 	}
 	
 	public void changeLevel(String lvlFile) {
-
+		
+		graphicsManager.fadeToBlack();
+		
 		GameEntity temp = playerFocusEntity;
 		gameEntities.clear();
 		gameEntities.add(temp);
 
 		GameMap map = resourceManager.loadMap("res/maps/"+lvlFile);
 		setLevel(map);
-		int startX = (gameMap.mapCanvas.get(playerFocusEntity.mapLevel).mapWidth * gameMap.tileDimensions)/2;
-		int startY = (gameMap.mapCanvas.get(playerFocusEntity.mapLevel).mapHeight * gameMap.tileDimensions)/2;
-
-		playerFocusEntity.setPosition(new float[]{startX, startY, 0});
-		camera.setPosition(startX, startY, 0);
+		camera.findPlayer();
+		
+		graphicsManager.fadeIn();
 	}
 }

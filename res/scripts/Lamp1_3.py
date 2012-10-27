@@ -6,7 +6,6 @@ class Entity(EntityScript):
         self.data = {}
 
     def onInteract(self):
-        self.data['level'] = 'Level2.xml'
-        self.data['state'] = 'none'
-        
+        self.data['appendMessage'] = 'Third Message!'
+        self.data['destroy'] = 'TRUE'
         return self.data

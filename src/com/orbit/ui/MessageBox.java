@@ -1,10 +1,12 @@
-package com.orbit.core;
+package com.orbit.ui;
 import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
+
+import com.orbit.core.WindowManager;
 
 public class MessageBox extends Canvas {
 
@@ -105,9 +107,6 @@ public class MessageBox extends Canvas {
 	 * of the message up to the last whitespace character, saving the remainder of the string back in
 	 * message. Once a substring is created that is less than maxWidth in length, print it and return.
 	 */
-	public void print() {
-		unicodeFont.drawString(x, y, message);
-	}
 	
 	public void processMessage() {
 		int tempEnd;
@@ -138,16 +137,16 @@ public class MessageBox extends Canvas {
 	
 	public void draw() {
 		super.draw();
-		prettyPrint();
+		print();
 	}
 	
-	public void prettyPrint() {
+	public void print() {
 		
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
 		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);	
-		print();
+		unicodeFont.drawString(x, y, message);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
 		GL11.glPopMatrix();
@@ -223,7 +222,6 @@ public class MessageBox extends Canvas {
 	}
 	
 	public void moveDown() {
-		System.out.println(y);
 		if (y <= 0) {
 			y += unicodeFont.getLineHeight()/2;
 		}

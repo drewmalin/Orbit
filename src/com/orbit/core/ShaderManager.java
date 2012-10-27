@@ -49,7 +49,7 @@ public class ShaderManager {
 		
 		int count = 0;
 		for (GameEntity ge : gameHandle.gameEntities)
-			if (ge.mapLevel == lvl)
+			if (ge.mapLevel == lvl && ge.lightRadius > 0)
 				count++;
 		
 		location = GL20.glGetUniformLocation(shaderProgram, "count");

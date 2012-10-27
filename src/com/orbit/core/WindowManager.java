@@ -3,11 +3,20 @@ package com.orbit.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import com.orbit.ui.Button;
+import com.orbit.ui.Canvas;
+import com.orbit.ui.MessageBox;
+import com.orbit.ui.Window;
+import com.orbit.xml.Node;
+import com.orbit.xml.XMLParser;
 
 public final class WindowManager {
 	
-	protected final Game gameHandle;
+	public final Game gameHandle;
 	
 	public final HashMap<String, Window> gui;
 	public final HashMap<String, Window> windows;
@@ -178,7 +187,12 @@ public final class WindowManager {
 	}
 
 	public void pollKeyboard() {
-		
+		if (windowStack.size() > 0)
+			while (Keyboard.next()) {
+				if (Keyboard.getEventKeyState())
+					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE)
+						popMenuStack();
+			}
 	}
 
 	public void pollMouse() {
@@ -223,15 +237,14 @@ public final class WindowManager {
 			}
 		});
 		
+		if (gui.get("storyBox") != null)
 		gui.get("storyBox").messageBoxes.get(0).setClickListener(new ClickListener() {
 			public void onScroll(int delta) {
 				if (delta > 0) {
-					System.out.println("moving up! - delta = " + delta);
-					gui.get("storyBox").messageBoxes.get(0).moveUp();
+					gui.get("storyBox").messageBoxes.get(0).moveDown();
 				}
 				else {
-					System.out.println("moving down! - delta = " + delta);
-					gui.get("storyBox").messageBoxes.get(0).moveDown();
+					gui.get("storyBox").messageBoxes.get(0).moveUp();
 				}
 			}
 		});

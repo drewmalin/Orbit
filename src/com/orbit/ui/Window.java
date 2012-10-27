@@ -1,9 +1,11 @@
-package com.orbit.core;
+package com.orbit.ui;
 
 import java.util.HashMap;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+
+import com.orbit.core.WindowManager;
 
 public class Window extends Canvas {
 	public HashMap<String, Button> buttons;
@@ -98,7 +100,6 @@ public class Window extends Canvas {
 			if (Mouse.getEventButtonState()) {
 				switch (Mouse.getEventButton()) {
 					case 0:	//Left click
-						System.out.println(name);
 						for (Button b : buttons.values()) {
 							if (b.hovering) {
 								b.onClick();
@@ -118,7 +119,6 @@ public class Window extends Canvas {
 					if (mb.hovering) {
 						mb.onScroll(mouseWheelDelta);
 					}
-					System.out.println();
 				}
 		}
 	}

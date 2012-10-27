@@ -1,6 +1,8 @@
-package com.orbit.core;
+package com.orbit.ui;
 
 import org.lwjgl.input.Mouse;
+
+import com.orbit.core.WindowManager;
 
 public class Button extends Canvas {
 
@@ -25,7 +27,7 @@ public class Button extends Canvas {
 			hoverMessageBox.x = Mouse.getX() + 20;
 			hoverMessageBox.y = windowManagerHandle.gameHandle.graphicsManager.getHeight() - Mouse.getY() + 20;
 			hoverMessageBox.show = true;
-			hoverMessageBox.prettyPrint();
+			hoverMessageBox.print();
 		}
 	}
 	
