@@ -120,7 +120,7 @@ public class GameEntity implements Moveable {
 						multiplier -= e.mass;
 						multiplier *= e.translateX(delta * multiplier);
 					}
-					if (e.scriptFile != null && this == ResourceManager.MANAGER.playerFocusEntity) {
+					if (this == ResourceManager.MANAGER.playerFocusEntity && e.scriptFile != null) {
 						ScriptManager.MANAGER.onInteract(e);
 						break;
 					}
@@ -130,6 +130,7 @@ public class GameEntity implements Moveable {
 			lastMovement.x = (delta * multiplier > 0 ? 1 : delta * multiplier < 0 ? -1 : 0);
 			lastMovement.y = 0;
 			
+
 			return multiplier;
 		}
 		

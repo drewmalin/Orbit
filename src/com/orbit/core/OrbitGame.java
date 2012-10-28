@@ -73,6 +73,8 @@ public class OrbitGame extends Game {
 		// Load first map
 		ResourceManager.MANAGER.loadMap("res/maps/Level1.xml");
 		Camera.CAMERA.findPlayer();
+		
+		ScriptManager.MANAGER.warmUp();
 	}
 	
 	private InputListener keyboardListener = new InputListener() {
@@ -90,6 +92,12 @@ public class OrbitGame extends Game {
 				if (Keyboard.getEventKeyState()) {
 					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE)
 						WindowManager.MANAGER.pushMenuStack("pause");
+					else if (Keyboard.getEventKey() == Keyboard.KEY_1)
+						ResourceManager.MANAGER.changeLevel("Level1.xml");
+					else if (Keyboard.getEventKey() == Keyboard.KEY_2)
+						ResourceManager.MANAGER.changeLevel("Level2.xml");
+					else if (Keyboard.getEventKey() == Keyboard.KEY_3)
+						ResourceManager.MANAGER.changeLevel("Level3.xml");
 				}
 			}
 			

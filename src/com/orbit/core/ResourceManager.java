@@ -121,15 +121,14 @@ public enum ResourceManager {
 	public void changeLevel(String lvlFile) {
 		
 		GraphicsManager.MANAGER.fadeToBlack();
-		
+
 		GameEntity temp = MANAGER.playerFocusEntity;
 		MANAGER.gameEntities.clear();
 		MANAGER.gameEntities.add(temp);
 
+		GameMap.MAP.unload();
 		loadMap("res/maps/"+lvlFile);
 		Camera.CAMERA.findPlayer();
-		
-		GraphicsManager.MANAGER.fadeIn();
 	}
 	
 	public void setFocusEntity(GameEntity ge) {

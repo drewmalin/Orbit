@@ -2,7 +2,7 @@
     <tileDimensions>32</tileDimensions>
     <tile>
     	<id>0</id>
-    	<file>res/textures/ground.png</file>
+    	<file>res/textures/ground_32.png</file>
     </tile>
     <canvas>
     	0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;
@@ -16,4 +16,31 @@
     	0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;
     	0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;
     </canvas>
+    <player>
+        <position>200 200 0</position>
+    </player>
+    <entity>
+        <file>res/entities/3/Lamp3_1.xml</file>
+        <position>10 10 0</position>
+    </entity>
+    <entity>
+        <file>res/entities/3/Lamp3_2.xml</file>
+        <position>100 100 0</position>
+    </entity>
+    <entity>
+        <file>res/entities/3/Lamp3_3.xml</file>
+        <position>100 10 0</position>
+    </entity>
+        <entity>
+        <file>res/entities/3/Lamp3_4.xml</file>
+        <position>300 10 0</position>
+    </entity>
+    <entity>
+        <file>res/entities/3/Lamp3_5.xml</file>
+        <position>300 100 0</position>
+    </entity>
+    <entity>
+        <file>res/entities/3/Lamp3_6.xml</file>
+        <position>300 200 0</position>
+    </entity>
 </map>

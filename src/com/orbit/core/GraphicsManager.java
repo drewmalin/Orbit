@@ -31,7 +31,7 @@ public enum GraphicsManager {
 	public final int border = 30;
 	
 	private long lastCheck = 0;
-	private float fadeDuration = 1000;
+	private float fadeDuration = 1500;
 	
 	GraphicsManager() {}
 	
@@ -252,30 +252,10 @@ public enum GraphicsManager {
 			
 			Display.update();
 			Display.sync(60);
-			
-		} while (lastCheck - currentTime < fadeDuration);
-	}
-	
-	public void fadeIn() {
-		long currentTime = System.currentTimeMillis();
-		
-		do	{
-			lastCheck = System.currentTimeMillis();
 
-			GL11.glColor4f(0f, 0f, 0f, 1 - (float)((lastCheck - currentTime) / fadeDuration));
-			
-			GL11.glBegin(GL11.GL_QUADS);
-				GL11.glVertex2f(0, 0);
-				GL11.glVertex2f(GraphicsManager.MANAGER.getWidth(), 0);
-				GL11.glVertex2f(GraphicsManager.MANAGER.getWidth(), GraphicsManager.MANAGER.getHeight());
-				GL11.glVertex2f(0, GraphicsManager.MANAGER.getHeight());
-			GL11.glEnd();
-			
-			Display.update();
-			Display.sync(60);
-			
 		} while (lastCheck - currentTime < fadeDuration);
 	}
+
 	//------------------ Getters/Setters ------------------//
 	
 	public void setFullscreen(boolean b) { fullScreen = b; }

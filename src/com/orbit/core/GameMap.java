@@ -129,4 +129,22 @@ public enum GameMap {
 			}
 		}
 	}
+
+	public void unload() {
+		mapCanvas.clear();
+		tiles.clear();
+		
+		// Special case tile: invisible tile
+		MapTile invisibleTile = new MapTile();
+		invisibleTile.id = -1;
+		invisibleTile.collidable = true;
+		tiles.put(-1, invisibleTile);
+		
+		// Special case tile: slippery tile
+		MapTile slipperyTile = new MapTile();
+		slipperyTile.id = -2;
+		tiles.put(-2, slipperyTile);
+		
+		lightLevel = 1;
+	}
 }
