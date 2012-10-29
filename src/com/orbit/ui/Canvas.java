@@ -61,6 +61,11 @@ public class Canvas {
 			clickListener.onScroll(delta);
 	}
 	
+	public void onKeyboardEvent(int key, char c) {
+		if (clickListener != null)
+			clickListener.onKeyEvent(key, c);
+	}
+	
 	public void drawMessages() {
 		for (MessageBox mb : messageBoxes) {
 			mb.draw();

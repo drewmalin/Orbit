@@ -184,7 +184,7 @@ public class MessageBox extends Canvas {
 	
 	public void addMessage(String moreMsg) {
 		String line = "";
-		moreMsg+="\n";
+		if (!moreMsg.equals("")) moreMsg+="\n";
 		
 		String[] tokens = moreMsg.split(" ");
 		
@@ -239,8 +239,8 @@ public class MessageBox extends Canvas {
 			parentTop = 0;
 		}
 		
-		if (height > parentBot - parentTop) {
-			y = -(height - (parentBot - parentTop));
+		if (height > parentBot - parentTop - unicodeFont.getLineHeight()) {
+			y = -(height - (parentBot - parentTop - unicodeFont.getLineHeight()));
 		}
 	}
 }

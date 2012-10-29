@@ -72,6 +72,8 @@ public class Game {
 		
 		while (!Display.isCloseRequested()) {
 			
+			//System.out.println(ResourceManager.MANAGER.playerFocusEntity.position);
+			
 			InputManager.MANAGER.pollKeyboard();
 			InputManager.MANAGER.pollMouse();
 			

@@ -1,13 +1,12 @@
-data = {}
-max = 3
-cur = 0
+progress = [False, False, False]
 
-def inc():
-    print("inc!")
-    global cur
-    cur += 1
-    
-    if (cur >= max):
-        return True
-    else:
-        return False
+def update(entID):
+    global progress
+    tempProgress = True
+    progress[entID] = True
+
+    for val in progress:
+        if val == False:
+            tempProgress = False
+
+    return tempProgress

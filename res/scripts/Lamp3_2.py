@@ -7,8 +7,8 @@ class Entity(EntityScript):
         self.data = {}
 
     def onInteract(self):
-        self.data['appendMessage'] = 'Lamp 2!'
-        self.data['destroy'] = 'TRUE'
-        self.data['createOther'] = ['res/entities/3/Lamp3_1.xml']
+        #self.data['appendMessage'] = 'Lamp 2!'
+        self.data['destroy'] = 'FALSE'
+        #self.data['createOther'] = ['res/entities/3/Lamp3_1.xml']
 
         return self.data

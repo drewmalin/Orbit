@@ -1,5 +1,6 @@
 package com.orbit.core;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,20 +23,14 @@ public enum WindowManager {
 	public final HashMap<String, Window> gui;
 	public final HashMap<String, Window> windows;
 	public ArrayList<Window> windowStack;
+	private String consoleMessage;
 	
 	WindowManager() {
 		gui 		= new HashMap<String, Window>();
 		windows 	= new HashMap<String, Window>();
 		windowStack	= new ArrayList<Window>();
 	}
-	/*
-	public WindowManager(Game gh) {
-		gameHandle 	= gh;
-		gui 		= new HashMap<String, Window>();
-		windows 	= new HashMap<String, Window>();
-		windowStack	= new ArrayList<Window>();
-	}
-*/
+
 	public Window createWindow(String name, int x, int y) {
 		Window w = new Window(this, null);
 		w.name = name;
@@ -69,6 +64,95 @@ public enum WindowManager {
 			windowStack.remove(windowStack.size() - 1);
 	}
 
+	public void loadConsole() {
+		Window window = new Window(this, null);
+		MessageBox mb = new MessageBox(this, window);
+
+		window.name = "console";
+		window.x = window.y = 0;
+		window.width = GraphicsManager.MANAGER.getWidth();
+		window.height = 100;
+		window.setColor(new float[] {0, 0, 0, .35f});
+		
+		mb.width = window.width;
+		mb.height = mb.height;
+		mb.fontName = "Times New Roman";
+		mb.fontSize = 14;
+		mb.setFontColor("white");
+		mb.x = mb.y = 0;
+		mb.setMessage("> ");
+		mb.load();
+
+		window.messageBoxes.add(mb);
+		windows.put(window.name, window);
+		consoleMessage = "";
+		
+		window.setClickListener(new ClickListener() {
+			public void onKeyEvent(int key, char keyChar) {
+				switch (key) {
+				case Keyboard.KEY_SPACE:
+					windows.get("console").messageBoxes.get(0).message += " ";
+					consoleMessage += " ";
+					break;
+				case Keyboard.KEY_RETURN:
+					windows.get("console").messageBoxes.get(0).addMessage("");
+					processConsoleMessage();
+					break;
+				case Keyboard.KEY_BACK:
+					if (consoleMessage.length() > 0) {
+						windows.get("console").messageBoxes.get(0).message = 
+							windows.get("console").messageBoxes.get(0).message.substring(0, windows.get("console").messageBoxes.get(0).message.length()-1);
+						consoleMessage = consoleMessage.substring(0, consoleMessage.length() - 1);
+					}
+					break;
+				default:
+					if (isValidKey(key)) {
+						windows.get("console").messageBoxes.get(0).message += keyChar;
+						consoleMessage += keyChar;
+					}
+				}
+			}
+		});
+	}
+	
+	public void processConsoleMessage() {
+		windows.get("console").messageBoxes.get(0).message += "> ";
+		
+		String[] tokens = consoleMessage.split(" ");
+		
+		if (tokens[0].equals("load")) {
+			if ((new File("res/maps/" + tokens[1])).exists())
+				ResourceManager.MANAGER.changeLevel(tokens[1]);
+			else {
+				windows.get("console").messageBoxes.get(0).message += "No file found at location " + "res/maps/" + tokens[1];
+				windows.get("console").messageBoxes.get(0).addMessage("");
+				windows.get("console").messageBoxes.get(0).message += "> ";
+			}
+		}
+		else if (tokens[0].equals("quit"))
+			System.exit(0);
+		
+		consoleMessage = "";
+	}
+	
+	public boolean isValidKey(int key) {
+		if (key == 15 || 	//TAB
+			key == 29 || 	//CTRL
+			key == 42 || 	//LSHIFT
+			key == 54 || 	//RSHIFT
+			key == 56 || 	//LALT
+			key == 58 || 	//CAPS
+			key == 184 ||	//RALT
+		    key == 200 ||	//UP
+		    key == 203 ||	//LEFT
+		    key == 205 ||	//RIGHT
+		    key == 208 ||	//DOWN
+		    key == 219 ||	//LCOMMAND
+		    key == 220)		//RCOMMAND
+			return false;
+		else
+			return true;
+	}
 	/** Load a menu xml file and store the resulting window, along with all of its message
 	 * boxes, buttons, and attributes.
 	 * 
@@ -195,10 +279,14 @@ public enum WindowManager {
 
 	public void pollKeyboard() {
 		if (windowStack.size() > 0)
+
 			while (Keyboard.next()) {
-				if (Keyboard.getEventKeyState())
+				if (Keyboard.getEventKeyState()) {
 					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE)
 						popMenuStack();
+					else
+						windowStack.get(windowStack.size() - 1).onKeyboardEvent(Keyboard.getEventKey(), Keyboard.getEventCharacter());
+				}
 			}
 	}
 
@@ -209,7 +297,6 @@ public enum WindowManager {
 		else
 			for (Window w : gui.values()) {
 				if (hovering(w)) {
-					
 					w.pollMouse();
 				}
 			}

@@ -13,24 +13,12 @@ public enum InputManager {
 	private InputListener keyboardListener;
 	private ArrayList<KeyTrigger> keyTriggers;
 	
-	//private Game gameHandle;
-	
 	InputManager() {
 		mouseListener 		= new InputListener();
 		keyboardListener 	= new InputListener();
-		//gameHandle 			= g;
 		keyTriggers			= new ArrayList<KeyTrigger>();
 	}
-	
-	/*
-	public InputManager(Game g) {
-		mouseListener 		= new InputListener();
-		keyboardListener 	= new InputListener();
-		gameHandle 			= g;
-		keyTriggers			= new ArrayList<KeyTrigger>();
-	}
-	*/
-	
+
 	public void setMouseListener(InputListener il) {
 		mouseListener = il;
 	}

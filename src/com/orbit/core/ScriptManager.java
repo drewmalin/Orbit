@@ -63,7 +63,13 @@ public enum ScriptManager {
 		if (ge.scriptFile != "") {
 			
 			ScriptManager.MANAGER.run(ge.scriptFile);
-			pyDict = MANAGER.entityScript.onInteract();	//run the actual script
+			
+			/* Call the various method that exist in the Java interface/Python class. If a method
+			 * called here has not been implemented in the Python object, the return object will be
+			 * null or the setup method will have no effect.
+			 */
+			MANAGER.entityScript.setPosition(ge.position.x, ge.position.y, ge.position.z);
+			pyDict = MANAGER.entityScript.onInteract();
 			
 			if (pyDict != null) {
 								
@@ -106,6 +112,11 @@ public enum ScriptManager {
 				queryScript = pyDict.get("level");
 				if (queryScript != null) {
 					ResourceManager.MANAGER.changeLevel(queryScript.toString());
+				}
+				
+				queryScript = pyDict.get("mass");
+				if (queryScript != null) {
+					ge.setMass(Float.parseFloat(queryScript.toString()));
 				}
 			}
 		}		

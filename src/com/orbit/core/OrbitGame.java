@@ -53,6 +53,7 @@ public class OrbitGame extends Game {
 		
 		// Load game menus
 		WindowManager.MANAGER.loadMenu("res/menu/pause.xml");
+		WindowManager.MANAGER.loadConsole();
 		WindowManager.MANAGER.createClickListeners();
 		
 		// Load Shaders (must be done after loading of graphicsmanager)
@@ -92,17 +93,12 @@ public class OrbitGame extends Game {
 				if (Keyboard.getEventKeyState()) {
 					if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE)
 						WindowManager.MANAGER.pushMenuStack("pause");
-					else if (Keyboard.getEventKey() == Keyboard.KEY_1)
-						ResourceManager.MANAGER.changeLevel("Level1.xml");
-					else if (Keyboard.getEventKey() == Keyboard.KEY_2)
-						ResourceManager.MANAGER.changeLevel("Level2.xml");
-					else if (Keyboard.getEventKey() == Keyboard.KEY_3)
-						ResourceManager.MANAGER.changeLevel("Level3.xml");
+					else if (Keyboard.getEventKey() == Keyboard.KEY_SLASH)
+						WindowManager.MANAGER.pushMenuStack("console");
 				}
 			}
 			
 			if (PhysicsUtilities.tileTest(playerFocusEntity, -2, GameMap.MAP)) {
-				//System.out.println(playerFocusEntity.lastMovement);
 				if (ResourceManager.MANAGER.playerFocusEntity.lastMovement.x != 0) {
 					playerDeltaX = 2 * playerFocusEntity.lastMovement.x;
 					if (lockEW) camDeltaX = playerDeltaX;

@@ -8,7 +8,6 @@ class Entity(EntityScript):
 
     def onInteract(self):
 
-        self.data['appendMessage'] = 'Lamp 1!'
-        self.data['destroy'] = 'TRUE'
+        self.data['destroy'] = 'FALSE'
 
         return self.data

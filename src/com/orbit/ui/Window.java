@@ -38,49 +38,8 @@ public class Window extends Canvas {
 		for (String b : buttons.keySet()) {
 			buttons.get(b).draw();
 		}
-//		for (String b : buttons.keySet()) {
-//			if (buttons.get(b).hoverMessageBox != null) {
-//				if (buttons.get(b).hovering)
-//					buttons.get(b).openHoverMessageBox();
-//				else
-//					buttons.get(b).closeHoverMessageBox();
-//			}
-//		}
 	}
-	/*
-	public void updateLoadingScreen(String message, float percentage) {
-		
-		this.draw();
-		messageBoxes.get(0).setMessage(message);
 
-		GL11.glPushMatrix();
-		GL11.glLoadIdentity();
-		GL11.glColor4f(1f, 0f, 0f, 1f);
-		GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2f((Engine.WIDTH * .1f), (Engine.HEIGHT * .75f));
-			GL11.glVertex2f((Engine.WIDTH * .1f), (Engine.HEIGHT * .75f) + 10);
-			GL11.glVertex2f((Engine.WIDTH * .1f) + ((Engine.WIDTH * .8f) * percentage), (Engine.HEIGHT * .75f) + 10);		
-			GL11.glVertex2f((Engine.WIDTH * .1f) + ((Engine.WIDTH * .8f) * percentage), (Engine.HEIGHT * .75f));
-		GL11.glEnd();
-		GL11.glPopMatrix();
-		Display.update();
-
-	}
-	*/
-	/*
-	public void checkGuiClick() {
-		for (String b : buttons.keySet()) {
-			buttons.get(b).checkHover(Mouse.getX(), Engine.HEIGHT - Mouse.getY());
-			if (buttons.get(b).hovering && Mouse.isButtonDown(0)) {
-				clickedButton = buttons.get(b);
-			}
-			if (buttons.get(b).hovering && Input.isMouseButtonUp() && clickedButton != null && clickedButton.equals(b)) {
-				buttons.get(b).onClick();
-				clickedButton = null; 
-			}
-		}
-	}
-	*/
 	public void poll() {
 		pollMouse();
 		pollKeyboard();
